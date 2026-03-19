@@ -1,0 +1,71 @@
+{
+    "nav": {
+        "start": "Home",
+        "about": "About",
+        "creator": "Content Creator",
+        "ai": "AI for Business",
+        "blog": "Blog",
+        "contact": "Contact"
+    },
+    "hero": {
+        "greeting": "Hello, I'm Bartlomiej",
+        "role": "Digital Expert • Content Creator • AI Consultant",
+        "contactBtn": "Contact Me",
+        "moreBtn": "Know Me Better"
+    },
+    "expertise": {
+        "title": "Digital World Expert",
+        "subtitle": "My competencies stem from working for major players (Decathlon, Wirtualna Polska) and successes in building my own projects.",
+        "items": [
+            {
+                "title": "Content Creator",
+                "description": "I merge my sports passion with professional video production. My technical skiing videos have reached over 1 million views, building a highly engaged community of 8k+ followers across Instagram and TikTok."
+            },
+            {
+                "title": "Data Analytics Excellence",
+                "description": "I implement Enterprise-class solutions (Google Analytics 4, BigQuery). I experienced in large-scale analytics platform migrations (14 CEE markets) and building advanced tracking strategies for web and mobile (Decathlon, WP)."
+            },
+            {
+                "title": "E-commerce Strategy",
+                "description": "I build sales strategies based on hard data. I managed e-commerce and implemented MarTech solutions that genuinely increase conversion and Customer Lifetime Value (LTV), bridging business and technology perspectives."
+            }
+        ]
+    },
+    "ai": {
+        "title": "AI for Business",
+        "subtitle": "Leverage my analytical experience to implement AI in a measurable and safe way.",
+        "badge": "Next Gen Business Intelligence",
+        "headingMain": "Don't guess.",
+        "headingSub": "Make AI-supported decisions.",
+        "description": "As a Digital Analytics Business Partner, I know data is the oil of the 21st century, but AI is the engine. I don't implement 'chatbots for fun'. I design processes where AI analyzes your results, automates reporting, and supports growth strategy — just as I did for corporations, but scaled for your business.",
+        "list": [
+            "Analytics Process Automation",
+            "E-commerce Perimeter Personalization",
+            "Decision Support (Data-Driven AI)",
+            "Scalable Marketing Systems"
+        ],
+        "stats": {
+            "efficiency": "Operational Efficiency",
+            "assistants": "AI Assistants Work",
+            "fit": "Business Fit"
+        }
+    },
+    "contentCreator": {
+        "title": "Content Creator",
+        "subtitle": "Technical skiing is my passion. I share knowledge, encourage progress, and inspire thousands to hit the slopes.",
+        "skiing": "Technical Skiing",
+        "description": "As an instructor and enthusiast, I create engaging and encouraging content helping skiers at every level. My technical skiing videos have reached over 1 million views across platforms, building a community of 8k+ followers."
+    },
+    "contact": {
+        "title": "Get in Touch",
+        "subtitle": "Have a project requiring digital expertise? Or want to chat about skiing or AI? Write to me.",
+        "rights": "Bartlomiej (skidoctor) Cygan. All rights reserved."
+    },
+    "blog": {
+        "title": "Blog",
+        "subtitle": "My thoughts on technology, business, and sports.",
+        "readMore": "Read more",
+        "back": "Back to blog",
+        "empty": "No posts here yet, but they will appear soon!"
+    }
+}

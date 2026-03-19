@@ -1,0 +1,71 @@
+{
+    "nav": {
+        "start": "Start",
+        "about": "O mnie",
+        "creator": "Content Creator",
+        "ai": "AI dla Biznesu",
+        "blog": "Blog",
+        "contact": "Kontakt"
+    },
+    "hero": {
+        "greeting": "Witaj, jestem Bartłomiej",
+        "role": "Digital Expert • Content Creator • AI Consultant",
+        "contactBtn": "Skontaktuj się",
+        "moreBtn": "Poznaj mnie"
+    },
+    "expertise": {
+        "title": "Ekspert Świata Cyfrowego",
+        "subtitle": "Moje kompetencje wywodzą się z pracy dla największych graczy (Decathlon, Wirtualna Polska) i sukcesów w budowaniu własnych projektów.",
+        "items": [
+            {
+                "title": "Content Creator",
+                "description": "Łączę sportową pasję z profesjonalną produkcją wideo. Moje materiały o technicznej jeździe na nartach osiągają ponad milion wyświetleń, budując zaangażowaną społeczność 8k+ obserwatorów na Instagramie i TikToku."
+            },
+            {
+                "title": "Analityka Danych Excellence",
+                "description": "Wdrażam rozwiązania klasy Enterprise (Google Analytics 4, BigQuery). Mam doświadczenie w migracji platform analitycznych na dużą skalę (14 rynków CEE) i budowaniu zaawansowanych strategii śledzenia dla web i mobile (Decathlon, WP)."
+            },
+            {
+                "title": "E-commerce Strategy",
+                "description": "Buduję strategie sprzedaży oparte o twarde dane. Zarządzałem e-commerce i wdrażałem rozwiązania MarTech, które realnie zwiększają konwersję i Customer Lifetime Value (LTV), łącząc perspektywę biznesową z technologiczną."
+            }
+        ]
+    },
+    "ai": {
+        "title": "AI dla Biznesu",
+        "subtitle": "Wykorzystaj moje doświadczenie analityczne, aby wdrożyć sztuczną inteligencję w sposób mierzalny i bezpieczny.",
+        "badge": "Next Gen Business Intelligence",
+        "headingMain": "Nie zgaduj.",
+        "headingSub": "Podejmuj decyzje wspierane przez AI.",
+        "description": "Jako Digital Analytics Business Partner wiem, że dane są ropą XXI wieku, ale to AI jest silnikiem. Nie wdrażam 'czatbotów dla zabawy'. Projektuję procesy, w których sztuczna inteligencja analizuje Twoje wyniki, automatyzuje raportowanie i wspiera strategię growth — tak jak robiłem to dla korporacji, ale w skali Twojego biznesu.",
+        "list": [
+            "Automatyzacja procesów analitycznych",
+            "Personalizacja perymetrów e-commerce",
+            "Wsparcie decyzji (Data-Driven AI)",
+            "Skalowalne systemy marketingowe"
+        ],
+        "stats": {
+            "efficiency": "Efektywności operacyjnej",
+            "assistants": "Praca asystentów AI",
+            "fit": "Dopasowania do biznesu"
+        }
+    },
+    "contentCreator": {
+        "title": "Content Creator",
+        "subtitle": "Jazda techniczna to moja pasja. Dzielę się wiedzą, motywuję do postępów i inspiruję tysiące osób na stokach.",
+        "skiing": "Technika Narciarska",
+        "description": "Jako instruktor i pasjonat, tworzę angażujące i motywujące treści, pomagające narciarzom na każdym poziomie. Moje materiały z techniką jazdy zebrały już ponad milion wyświetleń, budując społeczność 8 tysięcy obserwujących."
+    },
+    "contact": {
+        "title": "Skontaktuj się",
+        "subtitle": "Masz projekt, który wymaga cyfrowej ekspertyzy? A może chcesz porozmawiać o nartach lub AI? Napisz do mnie.",
+        "rights": "Bartłomiej (skidoctor) Cygan. Wszelkie prawa zastrzeżone."
+    },
+    "blog": {
+        "title": "Blog",
+        "subtitle": "Moje przemyślenia o technologii, biznesie i sporcie.",
+        "readMore": "Czytaj dalej",
+        "back": "Wróć do bloga",
+        "empty": "Jeszcze nie ma tu wpisów, ale wkrótce się pojawią!"
+    }
+}
