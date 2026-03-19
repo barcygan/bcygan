@@ -38,13 +38,13 @@ export function Contact({ dict }: { dict: Dictionary }) {
                     </p>
 
                     <motion.a
-                        href="mailto:kontakt@bartekcygan.pl"
+                        href="mailto:bart@bcygan.eu"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="group inline-flex items-center gap-4 border border-primary/30 bg-primary/5 px-10 py-5 text-xl font-bold text-foreground transition-all hover:border-primary hover:bg-primary/10"
                     >
                         <Mail className="h-6 w-6 text-primary" />
-                        <span className="link-draw">kontakt@bartekcygan.pl</span>
+                        <span className="link-draw">bart@bcygan.eu</span>
                         <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </motion.a>
                 </motion.div>
