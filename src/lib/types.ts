@@ -5,6 +5,7 @@ export interface Dictionary {
         creator: string;
         ai: string;
         blog: string;
+        articles: string;
         contact: string;
     };
     hero: {
@@ -47,6 +48,13 @@ export interface Dictionary {
         rights: string;
     };
     blog: {
+        title: string;
+        subtitle: string;
+        readMore: string;
+        back: string;
+        empty: string;
+    };
+    articles: {
         title: string;
         subtitle: string;
         readMore: string;

@@ -5,6 +5,7 @@
         "creator": "Content Creator",
         "ai": "AI for Business",
         "blog": "Blog",
+        "articles": "Articles",
         "contact": "Contact"
     },
     "hero": {
@@ -67,5 +68,12 @@
         "readMore": "Read more",
         "back": "Back to blog",
         "empty": "No posts here yet, but they will appear soon!"
+    },
+    "articles": {
+        "title": "Industry Articles",
+        "subtitle": "Professional case studies, analyses, and strategies I share with the industry.",
+        "readMore": "Read full article",
+        "back": "Back to articles",
+        "empty": "No articles found in this language."
     }
 }

@@ -5,6 +5,7 @@
         "creator": "Content Creator",
         "ai": "AI dla Biznesu",
         "blog": "Blog",
+        "articles": "Artykuły",
         "contact": "Kontakt"
     },
     "hero": {
@@ -67,5 +68,12 @@
         "readMore": "Czytaj dalej",
         "back": "Wróć do bloga",
         "empty": "Jeszcze nie ma tu wpisów, ale wkrótce się pojawią!"
+    },
+    "articles": {
+        "title": "Artykuły Branżowe",
+        "subtitle": "Profesjonalne case studies, analizy i strategie, którymi dzielę się z branżą.",
+        "readMore": "Czytaj pełny artykuł",
+        "back": "Wróć do artykułów",
+        "empty": "Brak artykułów w tym języku."
     }
 }

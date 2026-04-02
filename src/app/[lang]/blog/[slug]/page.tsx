@@ -60,7 +60,7 @@ export default async function BlogPost({ params }: { params: Promise<{ lang: str
                     </h1>
                 </header>
 
-                <div className="prose prose-lg dark:prose-invert mx-auto prose-blue prose-headings:font-bold prose-headings:tracking-tighter">
+                <div className="prose prose-lg prose-invert mx-auto prose-blue prose-headings:font-bold prose-headings:tracking-tighter">
                     <ReactMarkdown>{post.content}</ReactMarkdown>
                 </div>
             </article>
