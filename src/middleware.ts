@@ -12,7 +12,16 @@ function getLocale(request: NextRequest): string {
 
     // @ts-ignore
     let languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-    return match(languages, locales, defaultLocale);
+    
+    // Googlebot and other crawlers might not send Accept-Language
+    // Negotiator returns ['*'] or includes '*' which crashes the matcher
+    languages = languages.filter((lang: string) => lang !== '*');
+
+    try {
+        return match(languages, locales, defaultLocale);
+    } catch (error) {
+        return defaultLocale;
+    }
 }
 
 export function middleware(request: NextRequest) {
