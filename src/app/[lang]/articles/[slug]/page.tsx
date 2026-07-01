@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getDictionary } from "@/get-dictionary";
 import Script from 'next/script';
 import { FAQAccordion } from "@/components/FAQAccordion";
+import rehypeRaw from 'rehype-raw';
 
 export async function generateStaticParams() {
     const params = [];
@@ -163,7 +164,22 @@ export default async function ArticlePost({ params }: { params: Promise<{ lang: 
                 <div className="divider-accent mb-12"></div>
 
                 <div className="prose prose-lg prose-invert mx-auto prose-blue prose-headings:font-bold prose-headings:tracking-tighter">
-                    <ReactMarkdown>{markdownContent}</ReactMarkdown>
+                    <ReactMarkdown
+                        rehypePlugins={[rehypeRaw]}
+                        components={{
+                            img: ({ node: _node, ...props }) => (
+                                <span className="block my-12">
+                                    <img
+                                        {...props}
+                                        className="w-full h-auto rounded-2xl border border-border/50 shadow-2xl bg-card"
+                                        alt={props.alt || ""}
+                                    />
+                                </span>
+                            )
+                        }}
+                    >
+                        {markdownContent}
+                    </ReactMarkdown>
                 </div>
 
                 {faqs.length > 0 && (

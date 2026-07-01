@@ -1,41 +1,58 @@
 import { MetadataRoute } from 'next';
-
-const MAX_POSTS = 50;
+import { getAllArticles } from '@/lib/articles';
+import { getAllPosts } from '@/lib/blog';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    // In a real scenario, fetch blog posts here to add dynamic routes
-    // For now, static routes
+    const baseUrl = 'https://bartekcygan.pl';
+    const locales = ['pl', 'en'] as const;
 
-    return [
-        {
-            url: 'https://bartekcygan.pl',
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 1,
-        },
-        {
-            url: 'https://bartekcygan.pl/blog',
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://bartekcygan.pl/articles',
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://bartekcygan.pl/#expertise',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.5,
-        },
-        {
-            url: 'https://bartekcygan.pl/#contact',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.5,
-        },
-    ];
+    const routes: MetadataRoute.Sitemap = [];
+
+    // Base pages for each locale
+    for (const lang of locales) {
+        routes.push(
+            {
+                url: `${baseUrl}/${lang}`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly',
+                priority: 1.0,
+            },
+            {
+                url: `${baseUrl}/${lang}/blog`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly',
+                priority: 0.8,
+            },
+            {
+                url: `${baseUrl}/${lang}/articles`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly',
+                priority: 0.8,
+            }
+        );
+
+        // Dynamic articles
+        const articles = getAllArticles(lang);
+        for (const article of articles) {
+            routes.push({
+                url: `${baseUrl}/${lang}/articles/${article.slug}`,
+                lastModified: new Date(article.meta.date),
+                changeFrequency: 'monthly',
+                priority: 0.7,
+            });
+        }
+
+        // Dynamic blog posts
+        const posts = getAllPosts(lang);
+        for (const post of posts) {
+            routes.push({
+                url: `${baseUrl}/${lang}/blog/${post.slug}`,
+                lastModified: new Date(post.meta.date),
+                changeFrequency: 'monthly',
+                priority: 0.6,
+            });
+        }
+    }
+
+    return routes;
 }
