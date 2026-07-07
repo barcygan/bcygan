@@ -4,6 +4,7 @@ export interface Dictionary {
         about: string;
         creator: string;
         ai: string;
+        appAnalytics: string;
         blog: string;
         articles: string;
         contact: string;

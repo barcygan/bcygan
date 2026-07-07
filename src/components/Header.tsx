@@ -13,6 +13,7 @@ export function Header({ dict, lang }: { dict: Dictionary; lang: string }) {
         { name: dict.nav.about, href: `/${lang}#expertise` },
         { name: dict.nav.creator, href: `/${lang}#content-creator` },
         { name: dict.nav.ai, href: `/${lang}#ai-consultant` },
+        { name: dict.nav.appAnalytics, href: `/${lang}/analityka-w-aplikacji` },
         { name: dict.nav.blog, href: `/${lang}/blog` },
         { name: dict.nav.articles, href: `/${lang}/articles` },
         { name: dict.nav.contact, href: `/${lang}#contact` },
@@ -62,7 +63,7 @@ export function Header({ dict, lang }: { dict: Dictionary; lang: string }) {
                     </Link>
 
                     {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
