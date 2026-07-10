@@ -5,50 +5,53 @@ date: "2026-07-10"
 author: "Bartek Cygan"
 ---
 
-In digital marketing, we have grown accustomed to a relatively simple and linear user journey:
+In digital marketing, we have grown accustomed to a relatively simple and linear user journey – like a straight flight through empty space:
 
 **ad click → landing page view → conversion**
 
-All campaign parameters are stored in the URL query string, the browser retains cookies and referrer information, and the web analytics script (e.g., GA4) seamlessly logs the session and attributes the conversion.
+All campaign parameters travel effortlessly in the URL query string, the browser retains cookies, and the analytics script seamlessly logs the session and attributes the conversion.
 
-However, in mobile app install campaigns, this clean path breaks down completely.
+However, in mobile app install campaigns, this straight path collides with the massive gravity of the app stores.
 
 ---
 
 ### Why the Install Step is an Attribution "Black Hole"
 
-In the mobile app universe, the user journey looks very different:
+In the mobile app universe, your app is the center of the solar system, and ad networks (like Meta or Google) are distant planets. The user journey (our space probe) looks very different:
 
-**ad click → app store redirect (App Store/Google Play) → download → installation → first launch → in-app conversion**
+**ad click on planet "Meta" → entering the gravitational pull of the App Store → download → installation → landing (first launch) → conversion in the center (App)**
 
-When a user clicks an app install ad, they exit the browser or social platform and enter the isolated sandbox of the app store. At the time of installation, the newly downloaded app has no access to URL query parameters, browser cookies, or the user's click history.
+When a user clicks an app install ad, they leave their familiar orbit and enter the isolated sandbox of the app store. At the time of installation, the newly downloaded app has no access to URL query parameters, browser cookies, or the user's flight history. All source data disappears beyond the event horizon.
 
-> **The install step is a physical barrier that breaks the traditional tracking chain.**
+> **The install step is a black hole that physically breaks the traditional tracking chain and swallows the data.**
 
 <div class="grid gap-6 md:grid-cols-2 my-8">
-  <div class="border border-border/60 bg-card/20 p-6 rounded-2xl">
-    <h4 class="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-      <span class="h-2 w-2 rounded-full bg-blue-500"></span>
-      Web Journey (Traditional Website)
+  <div class="relative overflow-hidden border border-blue-500/20 bg-[#060814] p-6 rounded-3xl shadow-[0_0_30px_rgba(59,130,246,0.05)]">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.15)_0%,transparent_70%)] pointer-events-none"></div>
+    <h4 class="text-lg font-bold text-blue-100 mb-3 flex items-center gap-2 relative z-10">
+      <span class="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,1)]"></span>
+      Web Journey (Straight Flight)
     </h4>
-    <ol class="space-y-2 text-sm text-muted-foreground pl-4 list-decimal">
+    <ol class="space-y-3 text-sm text-blue-200/60 pl-4 list-decimal relative z-10 font-medium">
       <li>User clicks an ad (with UTM parameters)</li>
       <li>Lands directly on the target website</li>
-      <li>Analytics script logs the session and UTM tags</li>
-      <li><strong>Conversion happens on-site</strong> (deterministic attribution)</li>
+      <li>Analytics script logs the session</li>
+      <li class="text-blue-300"><strong>Conversion happens on-site</strong> (full data)</li>
     </ol>
   </div>
-  <div class="border border-red-500/30 bg-red-950/10 p-6 rounded-2xl">
-    <h4 class="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-      <span class="h-2 w-2 rounded-full bg-red-500"></span>
-      App Journey (Mobile Application)
+  <div class="relative overflow-hidden border border-purple-500/30 bg-[#0a0510] p-6 rounded-3xl shadow-[0_0_30px_rgba(168,85,247,0.05)]">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(168,85,247,0.15)_0%,transparent_70%)] pointer-events-none"></div>
+    <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full border border-purple-500/20 border-dashed animate-[spin_20s_linear_infinite] opacity-50"></div>
+    <h4 class="text-lg font-bold text-purple-100 mb-3 flex items-center gap-2 relative z-10">
+      <span class="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,1)]"></span>
+      App Journey (Black Hole)
     </h4>
-    <ol class="space-y-2 text-sm text-muted-foreground pl-4 list-decimal">
-      <li>User clicks an ad</li>
-      <li>Redirected to the app store (App Store / Google Play)</li>
-      <li>App is downloaded and installed (<strong>Attribution path is broken!</strong>)</li>
-      <li>User launches the app for the first time (<code>first_open</code>)</li>
-      <li><strong>In-app conversion happens</strong> (disconnected from original click)</li>
+    <ol class="space-y-3 text-sm text-purple-200/60 pl-4 list-decimal relative z-10 font-medium">
+      <li>User clicks an ad in orbit</li>
+      <li>Pulled into App Store / Google Play gravity</li>
+      <li class="text-purple-400">App is downloaded and installed (<strong>Data disappears beyond the horizon!</strong>)</li>
+      <li>User launches the app in the center</li>
+      <li><strong>In-app conversion happens</strong> (disconnected from source)</li>
     </ol>
   </div>
 </div>
@@ -60,7 +63,7 @@ Google Analytics 4 (GA4) is exceptionally good at tracking user behavior once th
 ### 1. Two Different Questions: Product Analytics vs Attribution
 
 When evaluating mobile apps, we must separate two entirely different analytical problems.
-<div class="relative my-12"><div class="grid gap-8 md:grid-cols-2 relative z-10 animate-slide-up"><div class="group relative overflow-hidden border border-blue-500/20 bg-blue-950/5 rounded-3xl p-6 sm:p-8 hover:border-blue-500/50 hover:bg-blue-950/10 transition-all duration-500 transform hover:-translate-y-2 shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] flex flex-col justify-between"><div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all duration-500"></div><div><div class="flex items-start gap-4 mb-6"><span class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 font-extrabold text-lg group-hover:scale-110 transition-transform duration-500 mt-1">01</span><div><h4 class="text-xl font-black tracking-tight text-foreground m-0">Product Analytics</h4><span class="text-xs font-mono text-blue-400 uppercase tracking-widest block mt-1">What is the user doing?</span></div></div><p class="text-sm font-semibold text-foreground mb-4">Key question: What happens after the app opens? Where are the errors? What is the retention rate?</p><p class="text-sm text-muted-foreground leading-relaxed mb-6">Focuses on <strong>product optimization and user engagement</strong>. Understanding where users face barriers and why they churn.</p></div><div class="space-y-4"><div class="bg-blue-950/20 border border-blue-500/10 rounded-2xl p-4"><span class="text-xs font-mono text-blue-400 block mb-1">Dedicated tool:</span><strong class="text-sm text-foreground">Google Analytics 4 &amp; Firebase SDK</strong></div><div class="flex flex-wrap gap-1.5"><span class="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono text-[10px] rounded-full">first_open</span><span class="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono text-[10px] rounded-full">screen_view</span><span class="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono text-[10px] rounded-full">retention</span><span class="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono text-[10px] rounded-full">funnels</span></div></div></div><div class="group relative overflow-hidden border border-green-500/20 bg-green-950/5 rounded-3xl p-6 sm:p-8 hover:border-green-500/50 hover:bg-green-950/10 transition-all duration-500 transform hover:-translate-y-2 shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] flex flex-col justify-between"><div class="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-2xl group-hover:bg-green-500/10 transition-all duration-500"></div><div><div class="flex items-start gap-4 mb-6"><span class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-green-500/10 text-green-400 font-extrabold text-lg group-hover:scale-110 transition-transform duration-500 mt-1">02</span><div><h4 class="text-xl font-black tracking-tight text-foreground m-0">Marketing Attribution</h4><span class="text-xs font-mono text-green-400 uppercase tracking-widest block mt-1">Where did they come from?</span></div></div><p class="text-sm font-semibold text-foreground mb-4">Key question: Which ad, campaign, or network led to the install and conversion?</p><p class="text-sm text-muted-foreground leading-relaxed mb-6">Focuses on <strong>marketing efficiency and ROAS</strong>. Connects the broken ad link to the install and deduplicates conversions across channels.</p></div><div class="space-y-4"><div class="bg-green-950/20 border border-green-500/10 rounded-2xl p-4"><span class="text-xs font-mono text-green-400 block mb-1">Dedicated tool:</span><strong class="text-sm text-foreground">Mobile Measurement Partner (MMP)</strong></div><div class="flex flex-wrap gap-1.5"><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">MMP SDK</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">Deduplication</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">SKAN / AAKit</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">Postbacks</span></div></div></div></div><div class="w-full border border-border/40 bg-card/20 rounded-2xl p-6 text-center mt-8 relative overflow-hidden"><div class="absolute -right-12 -top-12 w-24 h-24 bg-primary/5 rounded-full blur-xl"></div><p class="text-sm font-semibold text-foreground m-0">💡 <strong>Key takeaway:</strong> These two systems do not compete — they play complementary roles and should run in parallel.</p></div></div>
+<div class="relative my-12"><div class="grid gap-8 md:grid-cols-2 relative z-10 animate-slide-up"><div class="group relative overflow-hidden border border-orange-500/20 bg-[#0a0500] rounded-3xl p-6 sm:p-8 hover:border-orange-500/50 transition-all duration-500 shadow-[0_0_40px_rgba(249,115,22,0.05)] hover:shadow-[0_0_60px_rgba(249,115,22,0.15)] flex flex-col justify-between"><div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.1)_0%,transparent_100%)]"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] rounded-full border border-orange-500/10 border-dashed animate-[spin_60s_linear_infinite] opacity-30 pointer-events-none"></div><div class="relative z-10"><div class="flex items-start gap-4 mb-6"><span class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 text-orange-400 font-extrabold text-lg shadow-[0_0_15px_rgba(249,115,22,0.2)]">01</span><div><h4 class="text-xl font-black tracking-tight text-white m-0">Core Analytics (Product)</h4><span class="text-xs font-mono text-orange-400 uppercase tracking-widest block mt-1">What's happening on the sun?</span></div></div><p class="text-sm font-semibold text-orange-100/90 mb-4">What happens after the probe lands? Where are the errors?</p><p class="text-sm text-orange-200/60 leading-relaxed mb-6">Focuses on <strong>optimizing the core app itself</strong>. Understanding what happens at the center of the system.</p></div><div class="space-y-4 relative z-10"><div class="bg-orange-950/40 border border-orange-500/20 rounded-2xl p-4 backdrop-blur-md"><span class="text-xs font-mono text-orange-400 block mb-1">Dedicated tool:</span><strong class="text-sm text-white">Google Analytics 4 &amp; Firebase SDK</strong></div><div class="flex flex-wrap gap-1.5"><span class="px-2.5 py-1 bg-orange-500/10 border border-orange-500/20 text-orange-300 font-mono text-[10px] rounded-full">first_open</span><span class="px-2.5 py-1 bg-orange-500/10 border border-orange-500/20 text-orange-300 font-mono text-[10px] rounded-full">screen_view</span></div></div></div><div class="group relative overflow-hidden border border-emerald-500/20 bg-[#000a05] rounded-3xl p-6 sm:p-8 hover:border-emerald-500/50 transition-all duration-500 shadow-[0_0_40px_rgba(16,185,129,0.05)] hover:shadow-[0_0_60px_rgba(16,185,129,0.15)] flex flex-col justify-between"><div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.1)_0%,transparent_100%)]"></div><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] rounded-full border border-emerald-500/10 border-dashed animate-[spin_60s_linear_infinite_reverse] opacity-30 pointer-events-none"></div><div class="relative z-10"><div class="flex items-start gap-4 mb-6"><span class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 font-extrabold text-lg shadow-[0_0_15px_rgba(16,185,129,0.2)]">02</span><div><h4 class="text-xl font-black tracking-tight text-white m-0">Orbital Attribution (MMP)</h4><span class="text-xs font-mono text-emerald-400 uppercase tracking-widest block mt-1">Which planet sent them?</span></div></div><p class="text-sm font-semibold text-emerald-100/90 mb-4">Which planet (ad network) sent the user to our system?</p><p class="text-sm text-emerald-200/60 leading-relaxed mb-6">Focuses on <strong>interplanetary navigation and traffic</strong>. Connects the broken flight path through the black hole and deduplicates sources.</p></div><div class="space-y-4 relative z-10"><div class="bg-emerald-950/40 border border-emerald-500/20 rounded-2xl p-4 backdrop-blur-md"><span class="text-xs font-mono text-emerald-400 block mb-1">Dedicated tool:</span><strong class="text-sm text-white">Mobile Measurement Partner (MMP)</strong></div><div class="flex flex-wrap gap-1.5"><span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-[10px] rounded-full">MMP SDK</span><span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-[10px] rounded-full">Deduplication</span></div></div></div></div><div class="w-full border border-white/10 bg-[#050510] rounded-2xl p-6 text-center mt-8 relative overflow-hidden"><div class="absolute -right-12 -top-12 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div><p class="text-sm font-semibold text-white/90 m-0 relative z-10">🚀 <strong>Key takeaway:</strong> These two systems do not compete — they complete the solar system map. GA4 studies the sun, while MMP navigates the orbital traffic.</p></div></div><div class="group relative overflow-hidden border border-green-500/20 bg-green-950/5 rounded-3xl p-6 sm:p-8 hover:border-green-500/50 hover:bg-green-950/10 transition-all duration-500 transform hover:-translate-y-2 shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] flex flex-col justify-between"><div class="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-2xl group-hover:bg-green-500/10 transition-all duration-500"></div><div><div class="flex items-start gap-4 mb-6"><span class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-green-500/10 text-green-400 font-extrabold text-lg group-hover:scale-110 transition-transform duration-500 mt-1">02</span><div><h4 class="text-xl font-black tracking-tight text-foreground m-0">Marketing Attribution</h4><span class="text-xs font-mono text-green-400 uppercase tracking-widest block mt-1">Where did they come from?</span></div></div><p class="text-sm font-semibold text-foreground mb-4">Key question: Which ad, campaign, or network led to the install and conversion?</p><p class="text-sm text-muted-foreground leading-relaxed mb-6">Focuses on <strong>marketing efficiency and ROAS</strong>. Connects the broken ad link to the install and deduplicates conversions across channels.</p></div><div class="space-y-4"><div class="bg-green-950/20 border border-green-500/10 rounded-2xl p-4"><span class="text-xs font-mono text-green-400 block mb-1">Dedicated tool:</span><strong class="text-sm text-foreground">Mobile Measurement Partner (MMP)</strong></div><div class="flex flex-wrap gap-1.5"><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">MMP SDK</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">Deduplication</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">SKAN / AAKit</span><span class="px-2.5 py-0.5 bg-green-500/10 text-green-400 font-mono text-[10px] rounded-full">Postbacks</span></div></div></div></div><div class="w-full border border-border/40 bg-card/20 rounded-2xl p-6 text-center mt-8 relative overflow-hidden"><div class="absolute -right-12 -top-12 w-24 h-24 bg-primary/5 rounded-full blur-xl"></div><p class="text-sm font-semibold text-foreground m-0">💡 <strong>Key takeaway:</strong> These two systems do not compete — they play complementary roles and should run in parallel.</p></div></div>
 
 ---
 
@@ -274,11 +277,46 @@ Using this architecture, business reporting is clean and actionable:
 ---
 
 <div class="grid gap-4 sm:grid-cols-2 my-8">
-<div class="flex items-start gap-3.5 p-5 rounded-2xl bg-card/25 border border-border/40 hover:border-blue-500/30 hover:bg-card/50 transition-all duration-300">
-<div class="flex-shrink-0 w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm">✓</div>
-<div>
-<h5 class="text-sm font-bold text-foreground m-0 mb-1">Firebase SDK</h5>
-<p class="text-xs text-muted-foreground m-0 leading-relaxed">Firebase SDK is installed with active data streams for both Android and iOS.</p>
+
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Firebase SDK Probe</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Firebase SDK is installed in the system center (app) for Android and iOS.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Signal Mapping</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Unified event taxonomy is defined (onboarding, sign-up, trial, purchase).</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Referrer Gravity</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Google Play Install Referrer is verified and functioning on Android.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Wormholes</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Deep linking and deferred deep linking (Universal Links) are configured.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">ATT & SKAN Shields</h5><p class="text-xs text-white/50 m-0 leading-relaxed">The iOS ATT consent prompt is active, and the SKAN schema is mapped.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Resource Integration</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Subscription payment provider is integrated with the orbiting analytics.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">MMP Research Station</h5><p class="text-xs text-white/50 m-0 leading-relaxed">MMP is integrated with ad networks (planets), and postbacks are set up.</p></div>
+</div>
+<div class="relative overflow-hidden group flex items-start gap-4 p-5 rounded-3xl bg-[#030712] border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+<div class="absolute -inset-4 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm shadow-[0_0_10px_rgba(59,130,246,0.2)]">✓</div>
+<div class="relative z-10"><h5 class="text-sm font-bold text-white m-0 mb-1">Expedition Costs</h5><p class="text-xs text-white/50 m-0 leading-relaxed">Ad spend ingestion is configured between ad platforms and the MMP.</p></div>
 </div>
 </div>
 <div class="flex items-start gap-3.5 p-5 rounded-2xl bg-card/25 border border-border/40 hover:border-blue-500/30 hover:bg-card/50 transition-all duration-300">
@@ -338,11 +376,12 @@ Using this architecture, business reporting is clean and actionable:
 
 Below is an interactive map that visually represents the entire user journey and shows what **each analytics system sees** (GA4, MMP, SKAdNetwork) at every stage. Click a perspective and each node to see the details.
 
-<interactive-app-path></interactive-app-path>
 
-<div class="my-8 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
-<p class="text-sm text-foreground font-semibold m-0 mb-3">🗺️ Want the full-screen version with side-by-side comparison mode and Play animation?</p>
-<a href="/en/tools/attribution-map" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors no-underline">Open interactive map fullscreen →</a>
+<div class="relative overflow-hidden my-8 rounded-3xl border border-purple-500/20 bg-[#05030a] p-8 text-center shadow-[0_0_50px_rgba(168,85,247,0.05)]">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[200%] bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.15)_0%,transparent_70%)] pointer-events-none"></div>
+<p class="text-base text-purple-100 font-bold m-0 mb-5 relative z-10">🌌 Want to see a fullscreen simulation of the attribution solar system?</p>
+<a href="/en/tools/attribution-map" class="relative z-10 inline-flex items-center gap-2 px-8 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-black transition-all no-underline shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:-translate-y-1">Open the cosmic attribution map →</a>
 </div>
 
 ---

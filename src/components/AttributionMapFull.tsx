@@ -8,7 +8,7 @@ import Link from "next/link";
 
 type Screen = "welcome" | "journey";
 type EcosystemId = "meta" | "google" | "tiktok" | "asa";
-type PerspectiveId = "ga4" | "mmp" | "skan";
+type PerspectiveId = "ga4" | "mmp" | "skan" | "android";
 type NodeStatus = "visible" | "partial" | "hidden" | "blackhole";
 
 interface DataRow {
@@ -150,6 +150,16 @@ const PERSPECTIVES: Record<PerspectiveId, { label: string; emoji: string; color:
       ? "ASA używa AdAttributionKit zamiast SKAN. Atrybucja deterministyczna — pełna widoczność bez anonimizacji."
       : "Apple SKAN: atrybucja iOS zachowująca prywatność. Dane zanonimizowane, opóźnione i zagregowane.",
   },
+  android: {
+    label: "Android (Google Play)",
+    emoji: "🤖",
+    color: "#a4c639",
+    glow: "rgba(164,198,57,0.4)",
+    dim: "rgba(164,198,57,0.12)",
+    desc: (eco) => eco === "asa"
+      ? "Apple Search Ads występuje wyłącznie na platformie iOS. Ten scenariusz nie ma zastosowania na urządzeniach z Androidem."
+      : "Na Androidzie główną rolę odgrywa Google Play Install Referrer. Pozwala na atrybucję deterministyczną bez okna ATT.",
+  },
 };
 
 /* ─── Journey node data ─────────────────────────────────────── */
@@ -178,6 +188,7 @@ const NODES: JourneyNode[] = [
           { label: "SKAN Network ID", value: "Meta (podpisany)", status: "ok" },
           { label: "User ID",         value: "brak",             status: "anon" },
         ], note: "Meta podpisuje kliknięcie kryptograficznie. Dane kampanii istnieją w systemie Apple, ale User ID jest niedostępny z zasad prywatności." },
+        android: { status: "visible", dataState: [ { label: "utm_campaign", value: "testowa_kampania ✓", status: "ok" }, { label: "ATT limit", value: "brak ✓", status: "ok" } ], note: "Na Androidzie nie ma okna ATT. Aplikacje mogą korzystać z Google Advertising ID (GAID) do identyfikacji użytkownika przy kliknięciu." },
       },
       google: {
         ga4: { status: "visible", dataState: [
@@ -195,6 +206,7 @@ const NODES: JourneyNode[] = [
           { label: "gclid",           value: "brak na iOS",   status: "lost" },
           { label: "User ID",         value: "brak",          status: "anon" },
         ], note: "Na iOS, Google Ads też używa SKAdNetwork. gclid jest niedostępny po kliknięciu na iOS — Apple blokuje identyfikatory." },
+        android: { status: "visible", dataState: [ { label: "gclid", value: "natywny ✓", status: "ok" }, { label: "Firebase", value: "bezpośredni", status: "ok" } ], note: "Dla Google Ads środowisko Android to domowy ekosystem. Pełna widoczność kliknięcia." },
       },
       tiktok: {
         ga4: { status: "hidden", dataState: [], note: "TikTok Ads nie ma integracji z GA4. Piksel TikTok działa osobno — Firebase SDK jest nieaktywny w momencie kliknięcia." },
@@ -209,6 +221,7 @@ const NODES: JourneyNode[] = [
           { label: "SKAN Network ID", value: "TikTok (iOS)",     status: "ok" },
           { label: "User ID",         value: "brak",             status: "anon" },
         ], note: "TikTok jest zarejestrowany jako SKAN Network u Apple. Kliknięcie jest podpisane — ale bez User ID." },
+        android: { status: "visible", dataState: [ { label: "ttclid", value: "przechwycony ✓", status: "ok" }, { label: "GAID", value: "dostępny ✓", status: "ok" } ], note: "TikTok zapisuje identyfikator ttclid. Na Androidzie proces ten jest niezaburzony ograniczeniami prywatności Apple." },
       },
       asa: {
         ga4: { status: "partial", dataState: [
@@ -226,6 +239,7 @@ const NODES: JourneyNode[] = [
           { label: "Atrybucja",        value: "deterministyczna ✓",  status: "ok" },
           { label: "User ID",          value: "dostępny (za zgodą)", status: "ok" },
         ], note: "Apple Search Ads używa AdAttributionKit — następcy SKAN. To unikalny przywilej: atrybucja deterministyczna na iOS bez konieczności ATT consent!" },
+        android: { status: "hidden", dataState: [], note: "Apple Search Ads występuje wyłącznie w środowisku iOS. Ten krok nie dotyczy urządzeń z Androidem." },
       },
     },
   },
@@ -246,6 +260,7 @@ const NODES: JourneyNode[] = [
           { label: "SKAN weryfikacja", value: "Apple zatwierdza", status: "ok" },
           { label: "timer postbacku",  value: "24h–35 dni START", status: "delayed" },
         ], note: "App Store ma wbudowaną obsługę SKAN. Instalacja rejestrowana systemowo. Timer postbacku rusza." },
+        android: { status: "visible", dataState: [ { label: "Play Install Referrer", value: "aktywny ✓", status: "ok" }, { label: "Deferred Deep Link", value: "działa ✓", status: "ok" } ], note: "Sklep Google Play oferuje API 'Install Referrer', które pozwala na bezpieczne i precyzyjne przekazanie informacji o kliknięciu z powrotem do aplikacji." },
       },
       google: {
         ga4: { status: "visible", dataState: [
@@ -262,6 +277,7 @@ const NODES: JourneyNode[] = [
           { label: "gclid iOS",     value: "niedostępny",     status: "lost" },
           { label: "timer",         value: "24h–35 dni",      status: "delayed" },
         ], note: "Na iOS, Google Ads traci gclid przez App Store — wraca do SKAN jak inne sieci. Android jest znacznie lepszy dla Google Ads." },
+        android: { status: "visible", dataState: [ { label: "Sklep Play", value: "własny ekosystem ✓", status: "ok" }, { label: "gclid", value: "przechodzi dalej ✓", status: "ok" } ], note: "Sklep nie jest czarną dziurą. Google automatycznie przekazuje informacje o kampanii przez Play Store do aplikacji." },
       },
       tiktok: {
         ga4: { status: "hidden", dataState: [], note: "Sklep to bariera dla GA4 — parametry TikTok nie mają ścieżki przez App Store / Play Store do Firebase." },
@@ -274,6 +290,7 @@ const NODES: JourneyNode[] = [
           { label: "SKAN (iOS)", value: "weryfikuje Apple", status: "ok" },
           { label: "timer",      value: "start",           status: "delayed" },
         ], note: "SKAN obsługuje TikTok iOS niezawodnie. Instalacja zarejestrowana systemowo." },
+        android: { status: "visible", dataState: [ { label: "Play Install Referrer", value: "aktywny ✓", status: "ok" }, { label: "ttclid", value: "w tranzycie ✓", status: "ok" } ], note: "Podobnie jak Meta, TikTok wykorzystuje Google Play Install Referrer do przeniesienia swoich parametrów przez sklep." },
       },
       asa: {
         ga4: { status: "partial", dataState: [
@@ -289,6 +306,7 @@ const NODES: JourneyNode[] = [
           { label: "bez timera",       value: "wynik natychmiastowy ✓", status: "ok" },
           { label: "bez SKAN",         value: "nie potrzeba",           status: "ok" },
         ], note: "ASA omija SKAN całkowicie. AdAttributionKit działa bezpośrednio między App Store a aplikacją. Atrybucja deterministyczna — to wyjątkowy przywilej Apple Search Ads." },
+        android: { status: "hidden", dataState: [], note: "Brak reklamy Apple Search Ads w Google Play." },
       },
     },
   },
@@ -316,6 +334,7 @@ const NODES: JourneyNode[] = [
           { label: "utm_campaign", value: "brak",             status: "anon" },
           { label: "User ID",      value: "brak",             status: "lost" },
         ], note: "iOS potwierdza instalację po Meta. Campaign ID zamiast nazwy kampanii. Anonimowe — brak User ID." },
+        android: { status: "visible", dataState: [ { label: "Install Referrer", value: "odczytany ✓", status: "ok" }, { label: "atrybucja", value: "deterministyczna", status: "ok" } ], note: "Dzięki Play Install Referrer, SDK budzi się i precyzyjnie przypisuje instalację do kliknięcia na Meta." },
       },
       google: {
         ga4: { status: "visible", dataState: [
@@ -333,6 +352,7 @@ const NODES: JourneyNode[] = [
           { label: "gclid",           value: "UTRACONE iOS", status: "lost" },
           { label: "User ID",         value: "brak",         status: "anon" },
         ], note: "Na iOS, nawet Google Ads traci gclid. Instalacja potwierdzona przez SKAN ale bez nazwy kampanii i bez User ID." },
+        android: { status: "visible", dataState: [ { label: "Firebase", value: "auto-link ✓", status: "ok" }, { label: "atrybucja", value: "natywna ✓", status: "ok" } ], note: "GA4 i Google Ads łączą siły na Androidzie - first_open jest perfekcyjnie połączone z kampanią UAC bez użycia MMP." },
       },
       tiktok: {
         ga4: { status: "blackhole", dataState: [
@@ -350,6 +370,7 @@ const NODES: JourneyNode[] = [
           { label: "ttclid",             value: "brak",          status: "anon" },
           { label: "User ID",            value: "brak",          status: "lost" },
         ], note: "SKAN potwierdza instalację po TikTok. Tylko numeryczny Campaign ID — brak szczegółów kampanii." },
+        android: { status: "visible", dataState: [ { label: "Install Referrer", value: "odczytany ✓", status: "ok" }, { label: "atrybucja", value: "potwierdzona ✓", status: "ok" } ], note: "MMP na Androidzie z sukcesem dopasowuje nową instalację z historią kliknięcia w aplikacji TikTok." },
       },
       asa: {
         ga4: { status: "partial", dataState: [
@@ -367,6 +388,7 @@ const NODES: JourneyNode[] = [
           { label: "atrybucja",        value: "deterministyczna ✓",        status: "ok" },
           { label: "bez anonimizacji", value: "pełne dane",                status: "ok" },
         ], note: "ASA + AdAttributionKit = deterministyczna atrybucja iOS bez anonimizacji. Zero czarnej dziury — to wyjątek od reguły dla iOS." },
+        android: { status: "hidden", dataState: [], note: "Nie dotyczy Androida." },
       },
     },
   },
@@ -392,6 +414,7 @@ const NODES: JourneyNode[] = [
           { label: "postback",         value: "⏳ po timerze",   status: "delayed" },
           { label: "identyfikacja",    value: "anonimowa",       status: "anon" },
         ], note: "Aplikacja ustawia Conversion Value. Po timerze Apple wyśle anonimowy postback do Meta." },
+        android: { status: "visible", dataState: [ { label: "Install Referrer", value: "odczytany ✓", status: "ok" }, { label: "atrybucja", value: "deterministyczna", status: "ok" } ], note: "Dzięki Play Install Referrer, SDK budzi się i precyzyjnie przypisuje instalację do kliknięcia na Meta." },
       },
       google: {
         ga4: { status: "visible", dataState: [
@@ -409,6 +432,7 @@ const NODES: JourneyNode[] = [
           { label: "postback",         value: "⏳ opóźniony",  status: "delayed" },
           { label: "gclid iOS",        value: "brak",          status: "lost" },
         ], note: "Na iOS even Google Ads czeka na SKAN postback. gclid jest utracony — dane opóźnione i zanonimizowane." },
+        android: { status: "visible", dataState: [ { label: "Firebase", value: "auto-link ✓", status: "ok" }, { label: "atrybucja", value: "natywna ✓", status: "ok" } ], note: "GA4 i Google Ads łączą siły na Androidzie - first_open jest perfekcyjnie połączone z kampanią UAC bez użycia MMP." },
       },
       tiktok: {
         ga4: { status: "partial", dataState: [
@@ -426,6 +450,7 @@ const NODES: JourneyNode[] = [
           { label: "postback",         value: "⏳ po timerze", status: "delayed" },
           { label: "identyfikacja",    value: "anonimowa",     status: "anon" },
         ], note: "TikTok SKAN postback wysłany po timerze Apple. Anonimowe dane zagregowane." },
+        android: { status: "visible", dataState: [ { label: "Install Referrer", value: "odczytany ✓", status: "ok" }, { label: "atrybucja", value: "potwierdzona ✓", status: "ok" } ], note: "MMP na Androidzie z sukcesem dopasowuje nową instalację z historią kliknięcia w aplikacji TikTok." },
       },
       asa: {
         ga4: { status: "visible", dataState: [
@@ -443,6 +468,7 @@ const NODES: JourneyNode[] = [
           { label: "atrybucja",        value: "deterministyczna ✓",     status: "ok" },
           { label: "bez opóźnienia",   value: "natychmiastowe dane ✓",  status: "ok" },
         ], note: "ASA first_open z AdAttributionKit = natychmiastowa, deterministyczna atrybucja. Zero opóźnień, zero anonimizacji — wyjątek iOS." },
+        android: { status: "hidden", dataState: [], note: "Nie dotyczy Androida." },
       },
     },
   },
@@ -470,6 +496,7 @@ const NODES: JourneyNode[] = [
           { label: "wartość",         value: "zaokrąglona",  status: "anon" },
           { label: "atrybucja 1:1",   value: "niemożliwa",   status: "lost" },
         ], note: "SKAN postback z informacją o konwersji — opóźniony, zagregowany. iOS zakup nie zasila Meta bezpośrednio." },
+        android: { status: "visible", dataState: [ { label: "ROAS", value: "pełen (CAPI) ✓", status: "ok" }, { label: "atrybucja 1:1", value: "możliwa ✓", status: "ok" } ], note: "Brak ograniczeń narzucanych przez SKAN, więc konwersje Android przypisywane są deterministycznie w czasie rzeczywistym." },
       },
       google: {
         ga4: { status: "visible", dataState: [
@@ -488,6 +515,7 @@ const NODES: JourneyNode[] = [
           { label: "wartość iOS",   value: "zaokrąglona",       status: "anon" },
           { label: "Android",       value: "pełna atrybucja ✓", status: "ok" },
         ], note: "Na Android — pełna atrybucja Google. Na iOS — SKAN opóźnienie. Dlatego Google Ads działa lepiej na Android." },
+        android: { status: "visible", dataState: [ { label: "purchase", value: "49.99 PLN ✓", status: "ok" }, { label: "atrybucja 1:1", value: "deterministyczna", status: "ok" } ], note: "Zakup zasila Smart Bidding Google Ads natychmiast, pozwalając na szybką optymalizację ROAS." },
       },
       tiktok: {
         ga4: { status: "visible", dataState: [
@@ -507,6 +535,7 @@ const NODES: JourneyNode[] = [
           { label: "wartość",       value: "zaokrąglona",   status: "anon" },
           { label: "atrybucja 1:1", value: "niemożliwa",    status: "lost" },
         ], note: "SKAN iOS dla TikTok — opóźniony postback. Wartości zaokrąglone. Bez MMP nie ma pełnego obrazu." },
+        android: { status: "visible", dataState: [ { label: "postback", value: "→ TikTok API ✓", status: "ok" }, { label: "ROAS", value: "obliczony ✓", status: "ok" } ], note: "Szybki postback z Androida pozwala TikTokowi poprawnie zaliczyć konwersję do konkretnego twórcy / wideo." },
       },
       asa: {
         ga4: { status: "visible", dataState: [
@@ -524,6 +553,7 @@ const NODES: JourneyNode[] = [
           { label: "wartość",          value: "49.99 PLN (pełna) ✓",   status: "ok" },
           { label: "atrybucja 1:1",    value: "deterministyczna ✓",    status: "ok" },
         ], note: "ASA + AdAttributionKit: zakup z pełną deterministyczną atrybucją iOS. Wartość bez zaokrąglenia, natychmiastowo. Najlepsza jakość danych iOS." },
+        android: { status: "hidden", dataState: [], note: "Nie dotyczy Androida." },
       },
     },
   },
@@ -548,7 +578,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
   const isPl = lang === "pl";
   return (
     <motion.div
-      className="flex flex-col items-center w-full h-full px-6 pt-12 pb-8 sm:pt-20 text-center relative overflow-hidden"
+      className="flex flex-col lg:flex-row items-center justify-between w-full h-full px-6 pt-12 pb-8 sm:pt-20 text-center lg:text-left relative overflow-hidden gap-8 lg:gap-16 max-w-7xl mx-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
@@ -565,10 +595,10 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
         }
       `}</style>
 
-      {/* Top text content */}
-      <div className="relative z-20 flex flex-col items-center pointer-events-none max-w-4xl w-full">
+      {/* Left Column: Text */}
+      <div className="w-full lg:w-1/2 relative z-20 flex flex-col justify-center mt-4 lg:mt-0 pointer-events-none">
         <motion.div
-          className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono text-white/40 mb-8 sm:mb-10 uppercase tracking-widest pointer-events-auto"
+          className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono text-white/90 mb-8 sm:mb-10 uppercase tracking-widest pointer-events-auto mx-auto lg:mx-0 w-fit"
           initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
         >
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -583,7 +613,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
         </motion.h1>
 
         <motion.p
-          className="text-sm sm:text-base lg:text-lg text-white/40 max-w-xl mb-6 sm:mb-10 leading-relaxed"
+          className="text-sm sm:text-base lg:text-lg text-white/90 max-w-xl mx-auto lg:mx-0 mb-6 sm:mb-10 leading-relaxed"
           initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
         >
           {isPl
@@ -592,16 +622,16 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
         </motion.p>
       </div>
 
-      {/* Solar System */}
+      {/* Right Column: Solar System */}
       <motion.div 
-        className="relative flex-1 w-full flex items-center justify-center min-h-[300px]"
+        className="relative lg:w-1/2 w-full flex items-center justify-center min-h-[350px] lg:min-h-[500px]"
         initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6, duration: 0.8 }}
       >
-        <div className="relative w-full max-w-[520px] aspect-square group/solar pointer-events-auto">
+        <div className="relative w-full max-w-[400px] lg:max-w-[550px] aspect-square group/solar pointer-events-auto">
           {/* Sun */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-24 sm:h-24 rounded-full border border-white/10 bg-white/5 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.05)] z-10 backdrop-blur-sm">
             <span className="text-xl sm:text-3xl mb-0.5 sm:mb-1">📱</span>
-            <span className="text-[8px] sm:text-[10px] font-mono text-white/30 uppercase tracking-widest">App</span>
+            <span className="text-[8px] sm:text-[10px] font-mono text-white/90 uppercase tracking-widest">App</span>
           </div>
 
           {/* Orbit Rings - 4 distinct orbits */}
@@ -651,7 +681,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
                            }}>
                           <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl" style={{ background: eco.color + "60" }} />
                           <div className="font-black text-sm sm:text-base text-white mb-1.5">{eco.name}</div>
-                          <div className="text-[10px] sm:text-[11px] text-white/40 mb-4 leading-tight">{eco.sub}</div>
+                          <div className="text-[10px] sm:text-[11px] text-white/90 mb-4 leading-tight">{eco.sub}</div>
                           <div className="flex items-center gap-1.5 mt-auto">
                             <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: eco.badgeColor }} />
                             <span className="text-[9px] sm:text-[10px] font-semibold" style={{ color: eco.badgeColor }}>{eco.badge}</span>
@@ -667,7 +697,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
       </motion.div>
 
       <motion.p
-        className="text-[11px] text-white/20 font-mono mt-2 absolute bottom-6"
+        className="text-[11px] text-white/60 font-mono mt-2 absolute bottom-6"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95 }}
       >
         {isPl ? "najedź na planetę, aby zobaczyć szczegóły" : "hover a planet to see details"}
@@ -792,27 +822,27 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
         style={{ background: "rgba(2,8,24,0.9)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
       >
         {screen === "welcome" ? (
-          <Link href={backHref} className="flex items-center gap-2 text-xs font-mono text-white/30 hover:text-white/70 transition-colors">
+          <Link href={backHref} className="flex items-center gap-2 text-xs font-mono text-white/90 hover:text-white/90 transition-colors">
             ← {lang === "pl" ? "artykuł" : "article"}
           </Link>
         ) : (
           <button
             onClick={() => { setScreen("welcome"); stopPlay(); }}
-            className="flex items-center gap-2 text-xs font-mono text-white/30 hover:text-white/70 transition-colors cursor-pointer"
+            className="flex items-center gap-2 text-xs font-mono text-white/90 hover:text-white/90 transition-colors cursor-pointer"
           >
             <span className="text-base">{eco.icon}</span>
             <span className="hidden sm:inline" style={{ color: eco.color }}>{eco.name}</span>
-            <span className="text-white/20">· zmień</span>
+            <span className="text-white/60">· zmień</span>
           </button>
         )}
 
         {/* Center */}
         {screen === "welcome" ? (
-          <div className="absolute left-1/2 -translate-x-1/2 text-[11px] font-mono text-white/25 uppercase tracking-widest hidden sm:block">
+          <div className="absolute left-1/2 -translate-x-1/2 text-[11px] font-mono text-white/60 uppercase tracking-widest hidden sm:block">
             {lang === "pl" ? "Mapa Atrybucji Mobilnej" : "Mobile Attribution Map"}
           </div>
         ) : (
-          <div className="absolute left-1/2 -translate-x-1/2 text-[11px] font-mono text-white/25 uppercase tracking-widest hidden sm:block">
+          <div className="absolute left-1/2 -translate-x-1/2 text-[11px] font-mono text-white/60 uppercase tracking-widest hidden sm:block">
             {lang === "pl" ? "Ścieżka Atrybucji" : "Attribution Journey"}
           </div>
         )}
@@ -881,7 +911,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                     }}
                   />
                 ))}
-                <div className="text-[10px] font-mono text-white/20 mt-1">{activeNodeIdx + 1}/{NODES.length}</div>
+                <div className="text-[10px] font-mono text-white/60 mt-1">{activeNodeIdx + 1}/{NODES.length}</div>
               </div>
 
               {/* Center: Vertical nodes */}
@@ -949,7 +979,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
 
                       <motion.div className="mt-4 text-center" animate={{ opacity: isActive ? 1 : 0.3 }}>
                         <div className="text-sm font-black text-white whitespace-nowrap">{node.label}</div>
-                        <div className="text-[11px] text-white/35 mt-1 whitespace-nowrap max-w-[160px] truncate">{node.sublabel(ecosystem)}</div>
+                        <div className="text-[11px] text-white/90 mt-1 whitespace-nowrap max-w-[160px] truncate">{node.sublabel(ecosystem)}</div>
                       </motion.div>
                     </motion.div>
                   );
@@ -990,12 +1020,12 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                       {/* Data rows */}
                       {nodeData.dataState.length > 0 ? (
                         <div className="px-6 py-5">
-                          <div className="text-[10px] font-mono text-white/20 uppercase tracking-widest mb-4">Stan danych kampanii</div>
+                          <div className="text-[10px] font-mono text-white/60 uppercase tracking-widest mb-4">Stan danych kampanii</div>
                           <div className="space-y-3">
                             {nodeData.dataState.map((row, i) => (
                               <div key={i} className="flex items-center gap-3">
-                                <span className="text-[11px] font-mono text-white/30 shrink-0" style={{ minWidth: 120 }}>{row.label}</span>
-                                <span className="text-white/15 shrink-0 text-xs">→</span>
+                                <span className="text-[11px] font-mono text-white/90 shrink-0" style={{ minWidth: 120 }}>{row.label}</span>
+                                <span className="text-white/90 shrink-0 text-xs">→</span>
                                 <span className="flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-semibold" style={{
                                   background: STATUS_COLOR[row.status] + "10",
                                   color: row.status === "lost" ? STATUS_COLOR[row.status] + "80" : STATUS_COLOR[row.status],
@@ -1011,20 +1041,20 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                       ) : (
                         <div className="px-6 py-10 text-center">
                           <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center mx-auto mb-3">
-                            <span className="text-white/20 text-xl">—</span>
+                            <span className="text-white/60 text-xl">—</span>
                           </div>
-                          <div className="text-sm text-white/25">System nieaktywny na tym etapie</div>
+                          <div className="text-sm text-white/60">System nieaktywny na tym etapie</div>
                         </div>
                       )}
 
                       {/* Note */}
                       <div className="px-6 py-5 border-t" style={{ borderColor: "#ffffff08", background: "#ffffff03" }}>
-                        <p className="text-sm text-white/55 leading-relaxed m-0">{nodeData.note}</p>
+                        <p className="text-sm text-white/90 leading-relaxed m-0">{nodeData.note}</p>
                       </div>
                     </div>
 
                     {/* Perspective desc below panel */}
-                    <div className="mt-3 px-1 text-[11px] text-white/20 leading-relaxed">
+                    <div className="mt-3 px-1 text-[11px] text-white/60 leading-relaxed">
                       {persp.desc(ecosystem)}
                     </div>
                   </motion.div>
@@ -1046,8 +1076,8 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                 <motion.div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center pointer-events-none"
                   animate={{ y: [0, 8, 0], opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}>
-                  <div className="text-white/25 text-xs font-mono">scroll lub kliknij węzeł</div>
-                  <div className="text-white/15 text-lg mt-0.5">↕</div>
+                  <div className="text-white/60 text-xs font-mono">scroll lub kliknij węzeł</div>
+                  <div className="text-white/90 text-lg mt-0.5">↕</div>
                 </motion.div>
               )}
             </motion.div>
@@ -1061,7 +1091,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
           style={{ background: "rgba(2,8,24,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <button onClick={() => { goToNode(Math.max(0, activeNodeIdx - 1)); stopPlay(); }}
             disabled={activeNodeIdx === 0}
-            className="text-xs text-white/30 hover:text-white/70 disabled:opacity-15 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            className="text-xs text-white/90 hover:text-white/90 disabled:opacity-15 disabled:cursor-not-allowed transition-colors cursor-pointer">
             ← Poprzedni
           </button>
 
@@ -1073,7 +1103,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
 
           <button onClick={() => { goToNode(Math.min(NODES.length - 1, activeNodeIdx + 1)); stopPlay(); }}
             disabled={activeNodeIdx === NODES.length - 1}
-            className="text-xs text-white/30 hover:text-white/70 disabled:opacity-15 disabled:cursor-not-allowed transition-colors cursor-pointer">
+            className="text-xs text-white/90 hover:text-white/90 disabled:opacity-15 disabled:cursor-not-allowed transition-colors cursor-pointer">
             Następny →
           </button>
         </div>
