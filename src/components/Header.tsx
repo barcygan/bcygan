@@ -22,11 +22,14 @@ export function Header({ dict, lang }: { dict: Dictionary; lang: string }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
-    const { scrollYProgress } = useScroll();
+    const { scrollY, scrollYProgress } = useScroll();
 
     useMotionValueEvent(scrollYProgress, "change", (val) => {
         setScrollProgress(val * 100);
-        setIsScrolled(val > 0.02);
+    });
+
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        setIsScrolled(latest > 20);
     });
 
     return (

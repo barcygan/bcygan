@@ -5,7 +5,18 @@ import Link from 'next/link';
 import { getDictionary } from "@/get-dictionary";
 import Script from 'next/script';
 import { FAQAccordion } from "@/components/FAQAccordion";
+import { InteractiveAppPath } from "@/components/InteractiveAppPath";
 import rehypeRaw from 'rehype-raw';
+import type { Components } from 'react-markdown';
+
+// Tell TypeScript about our custom HTML element used in markdown
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'interactive-app-path': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+        }
+    }
+}
 
 export async function generateStaticParams() {
     const params = [];
@@ -100,16 +111,12 @@ export default async function ArticlePost({ params }: { params: Promise<{ lang: 
     }
 
     let markdownContent = article.content;
-    const faqTitleMarker = 
-        article.content.includes("### Często Zadawane") ? "### Często Zadawane Pytania (FAQ)" :
-        (article.content.includes("### Frequently Asked") ? "### Frequently Asked Questions (AI & SEO Optimized)" : null);
+    const isPolish = article.content.includes("### Często Zadawane");
+    const faqTitle = isPolish ? "Często Zadawane Pytania (FAQ)" : "Frequently Asked Questions (FAQ)";
 
-    const faqTitle = article.content.includes("### Często Zadawane") ? "Często Zadawane Pytania (FAQ)" : "Frequently Asked Questions (AI & SEO Optimized)";
-
-    if (faqTitleMarker && article.content.includes(faqTitleMarker)) {
-        markdownContent = article.content.split(faqTitleMarker)[0].replace(/<hr \/>\s*$/, "");
-    } else if (article.content.includes("### Często Zadawane Pytania")) {
-        markdownContent = article.content.split("### Często Zadawane Pytania")[0].replace(/<hr \/>\s*$/, "");
+    const faqIndex = article.content.search(/### (Często Zadawane Pytania|Frequently Asked Questions)/i);
+    if (faqIndex !== -1) {
+        markdownContent = article.content.substring(0, faqIndex).replace(/<hr \/>\s*$/, "").replace(/---\s*$/, "").trim();
     }
 
     const faqSchema = faqs.length > 0 ? {
@@ -175,8 +182,16 @@ export default async function ArticlePost({ params }: { params: Promise<{ lang: 
                                         alt={props.alt || ""}
                                     />
                                 </span>
-                            )
-                        }}
+                            ),
+                            table: ({ node: _node, ...props }) => (
+                                <div className="w-full overflow-x-auto my-8 border border-border/40 rounded-2xl bg-card/10 backdrop-blur-sm">
+                                    <table {...props} className="min-w-full text-sm m-0 border-collapse" />
+                                </div>
+                            ),
+                            'interactive-app-path': () => (
+                                <InteractiveAppPath lang={lang as "pl" | "en"} />
+                            ),
+                        } as Components & { 'interactive-app-path': () => React.ReactNode }}
                     >
                         {markdownContent}
                     </ReactMarkdown>
