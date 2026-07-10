@@ -339,7 +339,13 @@ Poniżej znajdziesz interaktywną mapę, która wizualnie przedstawia całą śc
 
 <interactive-app-path></interactive-app-path>
 
+<div class="my-8 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
+<p class="text-sm text-foreground font-semibold m-0 mb-3">🗺️ Chcesz zobaczyć pełnoekranową wersję mapy z trybem porównania i animacją Play?</p>
+<a href="/pl/tools/attribution-map" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors no-underline">Otwórz interaktywną mapę w pełnym ekranie →</a>
+</div>
+
 ---
+
 
 ### Często Zadawane Pytania (FAQ)
 

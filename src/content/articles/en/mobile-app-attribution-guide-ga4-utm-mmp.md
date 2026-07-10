@@ -340,7 +340,13 @@ Below is an interactive map that visually represents the entire user journey and
 
 <interactive-app-path></interactive-app-path>
 
+<div class="my-8 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
+<p class="text-sm text-foreground font-semibold m-0 mb-3">🗺️ Want the full-screen version with side-by-side comparison mode and Play animation?</p>
+<a href="/en/tools/attribution-map" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors no-underline">Open interactive map fullscreen →</a>
+</div>
+
 ---
+
 
 ### Frequently Asked Questions (FAQ)
 
