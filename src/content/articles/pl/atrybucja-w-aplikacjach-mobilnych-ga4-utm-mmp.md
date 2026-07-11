@@ -371,6 +371,16 @@ Dzięki takiemu podejściu raportowanie dla biznesu staje się przejrzyste:
 
 ---
 
+### Case Study: Kampania E-commerce i Deferred Deep Linking
+
+Najlepiej zrozumieć te różnice na konkretnym przykładzie. Wyobraź sobie, że prowadzisz aplikację e-commerce i właśnie ruszyłeś z kampanią "Wiosenna Wyprzedaż" skierowaną do lojalnych klientów (Web2App).
+
+Podczas kliknięcia w reklamę na telefonie mogą wystąpić dwa scenariusze:
+1. **Deep Link (Ma aplikację):** Użytkownik klika w reklamę, otwiera mu się natychmiast aplikacja na widoku wyprzedaży. Atrybucja jest prosta i niemal 100% skuteczna.
+2. **Deferred Deep Link (Nie ma aplikacji):** Użytkownik zostaje przekierowany do App Store / Google Play, gdzie pobiera aplikację, uruchamia ją (first_open) i dopiero wtedy skrypt próbuje go przenieść na stronę wyprzedaży.
+
+Poniższa mapa wizualizuje ten trudniejszy przypadek (Deferred Deep Link) dla kampanii `spring_sale_vip`, ponieważ to właśnie w "czarnej dziurze" sklepu tracimy najwięcej danych, a różnice między iOS i Androidem stają się kluczowe.
+
 ### Interaktywna Mapa Ścieżki Atrybucji
 
 Poniżej znajdziesz interaktywną mapę, która wizualnie przedstawia całą ścieżkę użytkownika i pokazuje, co **widzi każdy system analityczny** (GA4, MMP, SKAdNetwork) na każdym etapie. Kliknij perspektywę i każdy z węzłów, aby zobaczyć szczegóły.
