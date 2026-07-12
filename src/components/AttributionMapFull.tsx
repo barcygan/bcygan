@@ -8,6 +8,32 @@ import Link from "next/link";
 
 type Screen = "welcome" | "journey";
 type EcosystemId = "meta" | "google" | "tiktok" | "asa";
+
+type SummaryText = { pl: string; en: string };
+
+interface MatrixStatus {
+  status: "full" | "partial" | "none" | "na";
+  text: SummaryText;
+}
+
+interface EcosystemSummary {
+  dataAvailability: {
+    ga4: {
+      android: MatrixStatus;
+      ios: MatrixStatus;
+    };
+    mmp: {
+      android: MatrixStatus;
+      ios: MatrixStatus;
+    };
+    skan: {
+      android: MatrixStatus;
+      ios: MatrixStatus;
+    };
+  };
+  benefit: SummaryText;
+  risk: SummaryText;
+}
 type PerspectiveId = "ga4" | "mmp" | "skan";
 type NodeStatus = "visible" | "partial" | "hidden" | "blackhole";
 
@@ -72,7 +98,25 @@ const ECOSYSTEMS = [
     defaultCampaign: "testowa_kampania",
     badge: "Wymaga MMP + SKAN",
     badgeColor: "#f97316",
-    description: "Meta nie ma bezpośredniej integracji z GA4. Atrybucja przez sklep wymaga MMP (np. AppsFlyer, Adjust) i SKAdNetwork na iOS.",
+    description: "Meta wymaga MMP do atrybucji aplikacji (np. AppsFlyer, Adjust) i polega na danych ze SKAdNetwork w systemie iOS.",
+    summary: {
+      dataAvailability: {
+        ga4: {
+          android: { status: "partial", text: { pl: "Kampania ginie na start, przypisywana w tle", en: "Campaign lost at start, assigned in background" } },
+          ios: { status: "none", text: { pl: "Czarna dziura. (Wymagane wdrożenie MMP)", en: "Black hole. (MMP integration required)" } }
+        },
+        mmp: {
+          android: { status: "full", text: { pl: "Pełne (100% atrybucji deterministycznej)", en: "Full (100% deterministic attribution)" } },
+          ios: { status: "partial", text: { pl: "SKAN + Własne modele (AEM / Probabilistyka)", en: "SKAN + Custom models (AEM / Probabilistic)" } }
+        },
+        skan: {
+          android: { status: "full", text: { pl: "Play API bez opóźnień", en: "Play API with no delays" } },
+          ios: { status: "partial", text: { pl: "Zanonimizowane z opóźnieniem 24-48h", en: "Anonymized with 24-48h delay" } }
+        }
+      },
+      benefit: { pl: "Zaawansowane algorytmy optymalizacji zdarzeń (AEM) wspierające wysokiej jakości konwersje, mimo braków w deterministycznym śledzeniu.", en: "Advanced event optimization algorithms (AEM) supporting high-quality conversions despite deterministic tracking gaps." },
+      risk: { pl: "Utrata pełnego lejka (direct) w klasycznym GA4 dla iOS. Silne uzależnienie od postbacków S2S (CAPI) i opóźnień SKAN.", en: "Loss of full funnel (direct) in classic GA4 for iOS. Strong reliance on S2S postbacks (CAPI) and SKAN delays." }
+    }
   },
   {
     id: "google" as EcosystemId,
@@ -85,7 +129,25 @@ const ECOSYSTEMS = [
     defaultCampaign: "uac_fitness_kwiecien",
     badge: "Natywna integracja Firebase",
     badgeColor: "#22c55e",
-    description: "Google Ads ma natywną integrację z Firebase/GA4 przez Google Play Install Referrer i SKAN. Często nie potrzeba third-party MMP dla kampanii czysto Google.",
+    description: "Kampanie Google posiadają natywną integrację z Firebase i Google Play, co zapewnia bezstratną atrybucję w środowisku Android.",
+    summary: {
+      dataAvailability: {
+        ga4: {
+          android: { status: "full", text: { pl: "Pełne. Natywna więź Google Ads & Firebase", en: "Full. Native Google Ads & Firebase link" } },
+          ios: { status: "none", text: { pl: "Brak. Gclid przepada w sklepie Apple", en: "None. Gclid lost in Apple App Store" } }
+        },
+        mmp: {
+          android: { status: "full", text: { pl: "Pełne. Płynny odczyt z Referrera", en: "Full. Smooth read from Referrer" } },
+          ios: { status: "partial", text: { pl: "Podatne na wahania i opóźnienia SKAN", en: "Prone to fluctuations and SKAN delays" } }
+        },
+        skan: {
+          android: { status: "full", text: { pl: "System przekazuje gclid bezbłędnie", en: "System passes gclid flawlessly" } },
+          ios: { status: "partial", text: { pl: "Uzależnienie od agregacji Apple", en: "Dependence on Apple's aggregation" } }
+        }
+      },
+      benefit: { pl: "Bezbłędna atrybucja GA4 na Androidzie bez konieczności zewnętrznych narzędzi MMP, co obniża koszty technologiczne.", en: "Flawless GA4 attribution on Android without external MMP tools, reducing tech stack costs." },
+      risk: { pl: "Słaba widoczność kampanii (w tym iOS) w bezpłatnych narzędziach analitycznych innych niż z ekosystemu Google.", en: "Poor campaign visibility (especially iOS) in non-Google ecosystem analytical tools." }
+    }
   },
   {
     id: "tiktok" as EcosystemId,
@@ -98,7 +160,25 @@ const ECOSYSTEMS = [
     defaultCampaign: "tt_viral_fitness",
     badge: "Wymaga MMP",
     badgeColor: "#f97316",
-    description: "TikTok nie ma natywnej integracji z GA4. Własna atrybucja TikTok jest silnie stronnicza (self-attribution). MMP wymagany dla wiarygodnych danych.",
+    description: "Brak natywnej integracji z GA4. Raportowanie instalacji i konwersji jest silnie zależne od platformy MMP oraz SKAN.",
+    summary: {
+      dataAvailability: {
+        ga4: {
+          android: { status: "none", text: { pl: "Brak zaufanej integracji. Wymagane MMP", en: "No trusted integration. MMP required" } },
+          ios: { status: "none", text: { pl: "Izolacja w in-app browser zrzuca ruch", en: "In-app browser isolation drops traffic" } }
+        },
+        mmp: {
+          android: { status: "full", text: { pl: "Skutecznie powiązane przez ttclid", en: "Successfully linked via ttclid" } },
+          ios: { status: "partial", text: { pl: "Niestabilne i rygorystycznie obcinane przez iOS", en: "Unstable and strictly curtailed by iOS" } }
+        },
+        skan: {
+          android: { status: "full", text: { pl: "Natywna zgodność z logiką Androida", en: "Native compatibility with Android logic" } },
+          ios: { status: "partial", text: { pl: "Śledzenie utrudnione przez brak zgód ATT", en: "Tracking hindered by lack of ATT consent" } }
+        }
+      },
+      benefit: { pl: "Duży potencjał konwersji ze specyficznej demografii, silne własne raportowanie self-attribution.", en: "High conversion potential from specific demographics, strong internal self-attribution reporting." },
+      risk: { pl: "Brak integracji z Firebase (GA4 na iOS całkowicie ślepe na działania z TikToka). Izolacja wewnątrz In-App browser utrudnia Deferred Deep Linking.", en: "No Firebase integration (GA4 on iOS completely blind to TikTok activity). In-App browser isolation makes Deferred Deep Linking difficult." }
+    }
   },
   {
     id: "asa" as EcosystemId,
@@ -108,11 +188,29 @@ const ECOSYSTEMS = [
     color: "#a8b3cf",
     glow: "rgba(168,179,207,0.3)",
     dim: "rgba(168,179,207,0.1)",
-    defaultCampaign: "asa_fitness_brand",
-    badge: "Wbudowane w iOS",
-    badgeColor: "#3b82f6",
-    description: "Apple Search Ads jest wyjątkowy — bezpośrednio zintegrowany z iOS i AdAttributionKit. Nie potrzebuje SKAN ani third-party MMP. Atrybucja deterministyczna bez ATT.",
-  },
+    defaultCampaign: "search_brand_ios",
+    badge: "Deterministyczne API",
+    badgeColor: "#22c55e",
+    description: "Atrybucja na iOS oparta o framework AdAttributionKit. Pozwala na deterministyczny pomiar z pominięciem obostrzeń ATT.",
+    summary: {
+      dataAvailability: {
+        ga4: {
+          android: { status: "na", text: { pl: "N/A (Niedostępne)", en: "N/A (Not available)" } },
+          ios: { status: "full", text: { pl: "Pełne, jeśli wdrożysz AdAttributionKit API", en: "Full, if AdAttributionKit API implemented" } }
+        },
+        mmp: {
+          android: { status: "na", text: { pl: "N/A (Niedostępne)", en: "N/A (Not available)" } },
+          ios: { status: "full", text: { pl: "100% szczelności i brak wymogu okna ATT", en: "100% robust and no ATT prompt required" } }
+        },
+        skan: {
+          android: { status: "na", text: { pl: "N/A (Niedostępne)", en: "N/A (Not available)" } },
+          ios: { status: "full", text: { pl: "Natywne rozwiązanie z całkowitą pewnością", en: "Native solution with total certainty" } }
+        }
+      },
+      benefit: { pl: "Jedyny ekosystem oferujący 100% wiarygodny i natychmiastowy pomiar efektywności i ROAS w środowisku iOS.", en: "The only ecosystem offering 100% reliable and immediate efficiency and ROAS measurement on iOS." },
+      risk: { pl: "Wysoki koszt kliknięć (CPC) i organiczna kanibalizacja ruchu (płacenie za użytkowników, którzy zainstalowaliby apkę z wyników bezpłatnych).", en: "High Cost Per Click (CPC) and organic traffic cannibalization (paying for users who would install organically)." }
+    }
+  }
 ];
 
 /* ─── Perspectives ──────────────────────────────────────────── */
@@ -126,7 +224,7 @@ const PERSPECTIVES: Record<PerspectiveId, { label: string; emoji: string; color:
     dim: "rgba(249,115,22,0.12)",
     desc: (eco) => eco === "google"
       ? "Natywna integracja: GA4 widzi kampanię Google Ads bez większych przeszkód (zwłaszcza na Androidzie)."
-      : "GA4 widzi zachowanie wewnątrz aplikacji, ale na iOS gubi kontekst (źródło) podczas przejścia przez Sklep.",
+      : "Na platformie iOS kontekst źródłowy utracony podczas przejścia użytkownika przez środowisko App Store.",
   },
   mmp: {
     label: "MMP (AppsFlyer / Adjust)",
@@ -138,7 +236,7 @@ const PERSPECTIVES: Record<PerspectiveId, { label: string; emoji: string; color:
       ? "ASA nie potrzebuje MMP — natywny AdAttributionKit zastępuje jego rolę."
       : eco === "google"
         ? "MMP używa Play Install Referrer na Androidzie. Na iOS wspiera się modelowaniem i SKAN."
-        : "MMP stara się połączyć kliknięcie z instalacją używając technologii Deferred Deep Linkingu.",
+        : "Rozwiązanie MMP dokonuje estymacji powiązania sesji za pomocą technik modelowania i Deferred Deep Linking.",
   },
   skan: {
     label: "Poziom Systemu (SKAN / OS)",
@@ -148,7 +246,7 @@ const PERSPECTIVES: Record<PerspectiveId, { label: string; emoji: string; color:
     dim: "rgba(59,130,246,0.12)",
     desc: (eco) => eco === "asa"
       ? "ASA korzysta z deterministycznego AdAttributionKit. Brak okna ATT, brak anonimizacji."
-      : "Na iOS: zanonimizowany SKAdNetwork z opóźnieniami. Na Androidzie: natywny Google Play Install Referrer w tle.",
+      : "Środowisko iOS: agregacja danych w SKAdNetwork (wymuszone opóźnienia). Android: w pełni natywne odczyty z Play Install Referrer.",
   },
 };
 
@@ -165,54 +263,54 @@ const NODES: JourneyNode[] = [
     },
     data: {
       meta: {
-        ga4: { status: "hidden", dataState: [], note: "Firebase SDK jest uśpiony. GA4 webowe może widzieć kliknięcie, ale sesja mobilna jeszcze się nie zaczęła." },
+        ga4: { status: "hidden", dataState: [], note: "Brak zdarzeń inicjujących w Firebase SDK. Rejestrowana jest wyłącznie sesja w obszarze przeglądarki Web." },
         mmp: { status: "visible", dataState: [
           { label: "utm_campaign", value: "spring_sale_vip", status: "ok" },
           { label: "MMP Click Link", value: "wygenerowany ✓", status: "ok" },
           { label: "Kierowanie", value: "sprawdza czy masz apkę", status: "ok" }
-        ], note: "MMP linkuje kliknięcie. Rozpoznaje urządzenie i sprawdza: 'Ma apkę? → Deep Link. Brak apki? → Sklep'." },
+        ], note: "MMP identyfikuje parametr kliknięcia i weryfikuje status instalacji aplikacji, determinując proces Deep Linkingu lub przekierowania do platformy dystrybucyjnej." },
         skan: { status: "partial", dataState: [
           { label: "Ad Network ID", value: "podpisany", status: "ok" },
           { label: "User ID (ATT)", value: "zależne od zgody", status: "partial" }
-        ], note: "Na poziomie systemu podpisuje się intencję reklamową. Jeśli użytkownik ma iOS i zablokował śledzenie, brak User ID." },
+        ], note: "Podpis sygnatury reklamowej na poziomie systemu (OS). W środowisku iOS, zablokowanie parametrów śledzenia (ATT) uniemożliwia agregację identyfikatora." },
       },
       google: {
         ga4: { status: "visible", dataState: [
           { label: "utm_campaign", value: "spring_sale_vip", status: "ok" },
           { label: "gclid", value: "wygenerowany ✓", status: "ok" }
-        ], note: "Dzięki ekosystemowi Google, gclid i utm zostają dopisane do kliknięcia na poziomie przeglądarki Web/Youtube." },
+        ], note: "Parametry UTM oraz gclid są prawidłowo propagowane na poziomie przeglądarki i platformy Google." },
         mmp: { status: "visible", dataState: [
           { label: "utm_campaign", value: "spring_sale_vip", status: "ok" },
           { label: "gclid", value: "zarejestrowany", status: "ok" }
-        ], note: "MMP zbiera informację o kliknięciu z kampanii UAC / Search i przygotowuje się na ewentualny Deferred Deep Link." },
+        ], note: "MMP rejestruje kliknięcie reklamowe z sieci UAC w celu budowy sesji do obsługi strumienia Deferred Deep Link." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] SKAN ID", value: "aktywny", status: "ok" },
           { label: "[Android] Play", value: "rejestruje start", status: "ok" }
-        ], note: "Na iOS generowany jest podpis SKAN. Na Androidzie Google Play szykuje się do przekazania Install Referrer." },
+        ], note: "Generowanie parametrów SKAdNetwork (iOS) oraz inicjacja procesu śledzenia Play Install Referrer (Android)." },
       },
       tiktok: {
-        ga4: { status: "hidden", dataState: [], note: "Brak integracji TikTok Ads z Firebase na etapie kliknięcia w in-app browser." },
+        ga4: { status: "hidden", dataState: [], note: "Brak zintegrowanego modelu przekazywania danych z przeglądarki in-app platformy TikTok do środowiska Firebase." },
         mmp: { status: "visible", dataState: [
           { label: "utm_campaign", value: "spring_sale_vip", status: "ok" },
           { label: "ttclid", value: "wygenerowany ✓", status: "ok" }
-        ], note: "MMP rejestruje kliknięcie z TikTok i generuje fingerprint dla przeglądarki In-App TikToka, żeby rozpoznać instalację." },
+        ], note: "MMP inicjuje logowanie kliknięcia w oparciu o modele probabilistyczne (fingerprinting) dla przeglądarki TikTok In-App." },
         skan: { status: "partial", dataState: [
           { label: "SKAN ID", value: "TikTok iOS", status: "ok" },
           { label: "User ID", value: "zazwyczaj brak (ATT)", status: "lost" }
-        ], note: "TikTok podpisuje kliknięcie w SKAN. Jeśli użytkownik odmawia śledzenia, gubimy identyfikator reklamowy." },
+        ], note: "Przekazanie kliknięcia do sygnatury SKAN. W przypadku braku zgody ATT, trwała utrata widoczności na identyfikatory reklamowe." },
       },
       asa: {
         ga4: { status: "partial", dataState: [
           { label: "utm_campaign", value: "N/A", status: "lost" },
           { label: "AdAttrib token", value: "wygenerowany", status: "ok" }
-        ], note: "Kampania ASA nie używa tradycyjnych tagów UTM, opiera się wyłącznie na tokenie systemowym iOS." },
+        ], note: "System ASA ignoruje tagi UTM na rzecz natywnych, wbudowanych tokenów atrybucyjnych systemu iOS." },
         mmp: { status: "partial", dataState: [
           { label: "MMP SDK", value: "czeka w aplikacji", status: "partial" }
-        ], note: "MMP nie ma bezpośredniego linku przekierowującego (bo ASA dzieje się wewnątrz App Store). Czeka aż użytkownik otworzy aplikację." },
+        ], note: "Platforma MMP nie odbiera żądania przekierowania (atrybucja zamknięta w ekosystemie App Store). Oczekuje na zdarzenie uruchomienia aplikacji." },
         skan: { status: "visible", dataState: [
           { label: "AdAttributionKit", value: "aktywny ✓", status: "ok" },
           { label: "Privacy Limits", value: "brak okna ATT ✓", status: "ok" }
-        ], note: "Poziom Systemu: Apple w pełni i deterministycznie rejestruje kliknięcie reklamowe bezpośrednio w swoim sklepie, ignorując ATT." },
+        ], note: "Warstwa systemowa (iOS) deterministycznie weryfikuje atrybucję reklamową w ekosystemie App Store z całkowitym pominięciem ograniczeń ATT." },
       },
     },
   },
@@ -227,56 +325,56 @@ const NODES: JourneyNode[] = [
         ga4: { status: "blackhole", dataState: [
           { label: "[iOS] Sklep", value: "blokada UTM", status: "lost" },
           { label: "[Android] Sklep", value: "wymaga configu", status: "partial" }
-        ], note: "Czarna dziura. Dla użytkownika bez aplikacji przejście przez App Store całkowicie czyści parametry UTM. GA4 ślepnie." },
+        ], note: "Ślepy punkt w analityce: App Store całkowicie izoluje sesję instalacyjną i odrzuca parametry tagowania (UTM). Całkowity brak widoczności w usłudze GA4." },
         mmp: { status: "partial", dataState: [
           { label: "[Android] Referrer", value: "niezawodny ✓", status: "ok" },
           { label: "[iOS] Fingerprint", value: "niedokładny ⚠️", status: "partial" }
-        ], note: "Użytkownik nie miał apki. Na Androidzie Install Referrer poda nam skąd przyszedł. Na iOS MMP musi zgadywać (Fingerprinting) lub czekać na powolny SKAN." },
+        ], note: "Rejestracja dla ruchu bez pre-instalacji. W środowisku Android dane pokryte są przez Referrer API. W iOS atrybucja zależy od skuteczności modeli probabilistycznych MMP." },
         skan: { status: "visible", dataState: [
           { label: "[iOS] SKAN", value: "rejestruje pobranie", status: "ok" },
           { label: "[Android]", value: "Play Store Play API", status: "ok" }
-        ], note: "Systemy operacyjne zawsze wiedzą, że użytkownik kliknął i pobrał aplikację. Systemowy tracker zaczyna działać niezależnie." },
+        ], note: "Monitorowanie sesji na poziomie warstwy operacyjnej. Proces logowania instalacji przebiega natywnie i poprawnie." },
       },
       google: {
         ga4: { status: "visible", dataState: [
           { label: "[Android] gclid", value: "zapisany w Play ✓", status: "ok" },
           { label: "[iOS] gclid", value: "UTRACONY ❌", status: "lost" }
-        ], note: "Dzięki symbiozie na Androidzie, Sklep Play chroni parametr gclid i czeka z nim na Firebase. Na iOS niestety gclid bezpowrotnie ginie w App Store." },
+        ], note: "Zachowanie parametrów śledzenia (gclid) jest pełne dla środowiska Play Store. Przejście przez App Store na systemie iOS powoduje trwałą utratę danych dla Firebase." },
         mmp: { status: "partial", dataState: [
           { label: "[Android] Referrer", value: "gclid + utm ✓", status: "ok" },
           { label: "[iOS] Deferred DL", value: "niestabilny ⚠️", status: "partial" }
-        ], note: "Na Androidzie MMP radzi sobie doskonale. Na iOS Apple walczy z Deferred Deep Linkingiem opartym na dopasowywaniu adresów IP." },
+        ], note: "MMP z powodzeniem atrybuuje ruch Android za sprawą dedykowanego API. Środowisko iOS systematycznie deprecjonuje modele weryfikacji po stronie sieciowej (IP matching)." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] SKAN", value: "pobranie odnotowane", status: "ok" },
           { label: "Timer", value: "zaczyna odliczać", status: "delayed" }
-        ], note: "Z punktu widzenia systemu pobranie się udaje, ale na iOS uruchamia się kilkudziesięciogodzinny stoper zanim Apple wyśle dane." },
+        ], note: "Status pobrania jest walidowany, jednak ramy czasowe na systemie iOS ulegają wielogodzinnemu opóźnieniu z uwagi na wymuszone okna raportowe SKAN." },
       },
       tiktok: {
         ga4: { status: "blackhole", dataState: [
           { label: "utm_campaign", value: "wyczyszczone", status: "lost" },
           { label: "ttclid", value: "wyczyszczone", status: "lost" }
-        ], note: "Rozpoczyna się czarna dziura dla GA4. Ruch przychodzi jako Organic / Direct po pobraniu." },
+        ], note: "Brak pomiaru atrybucji deterministycznej. Konsekwencją jest kwalifikacja całej konwersji jako źródło nieskategoryzowane (Organic/Direct) w platformie GA4." },
         mmp: { status: "partial", dataState: [
           { label: "[Android] Referrer", value: "podaje ttclid ✓", status: "ok" },
           { label: "[iOS] IP Match", value: "niska skuteczność", status: "partial" }
-        ], note: "MMP na Androidzie świetnie odzyskuje ttclid z Referrera. Na iOS utrata danych jest potężna z powodu izolacji przeglądarki TikToka od Safari." },
+        ], note: "Odzyskiwanie parametru atrybucyjnego (ttclid) powodzi się dla platform Android. System iOS notuje strukturalne opóźnienia i straty na skutek sandoxingu (izolacji) przeglądarki." },
         skan: { status: "visible", dataState: [
           { label: "[iOS] SKAN", value: "rejestracja Apple", status: "ok" },
           { label: "[Android] Play", value: "rejestracja Google", status: "ok" }
-        ], note: "Systemy operacyjne działają niezawodnie i w pełni przypisują instalację TikToka pod spodem, mimo braku dostępu dla narzędzi analitycznych." },
+        ], note: "Logowanie operacyjne zachowuje pełną spójność danych instalacyjnych, uniemożliwiając jedynie dostęp aplikacyjny i analityczny firmom trzecim." },
       },
       asa: {
         ga4: { status: "partial", dataState: [
           { label: "App Store", value: "generuje token ✓", status: "ok" },
           { label: "utm_campaign", value: "N/A", status: "lost" }
-        ], note: "GA4 czeka na uruchomienie aplikacji. App Store przechowuje bezpieczny token instalacyjny dla aplikacji." },
+        ], note: "Brak natychmiastowego logowania w usłudze GA4 do czasu finalizacji procesu uruchomienia oprogramowania. Generowany jest zanonimizowany token instalacji (App Store)." },
         mmp: { status: "visible", dataState: [
           { label: "App Store", value: "natywna atrybucja ✓", status: "ok" }
-        ], note: "MMP nie uczestniczy aktywnie w przekazywaniu linku, bo ASA działa na serwerach Apple. Czeka aż aplikacja pobierze dane systemowe." },
+        ], note: "Moduł MMP funkcjonuje w trybie pasywnym w architekturze ASA. Weryfikacja danych następuje wyłącznie po nawiązaniu łączności z rejestrem systemowym Apple." },
         skan: { status: "visible", dataState: [
           { label: "[iOS] AdAttribKit", value: "natychmiastowe ✓", status: "ok" },
           { label: "Deterministyczne", value: "100% pewności ✓", status: "ok" }
-        ], note: "Dla Apple Search Ads sklep App Store nie jest czarną dziurą – to główny punkt idealnej atrybucji deterministycznej." },
+        ], note: "W odróżnieniu od środowisk otwartych, ekosystem App Store gwarantuje stabilny i wysoce wiarygodny proces deterministycznego weryfikowania instalacji dla usługi ASA." },
       },
     },
   },
@@ -291,60 +389,60 @@ const NODES: JourneyNode[] = [
           { label: "event", value: "first_open ✓", status: "ok" },
           { label: "[Android]", value: "(direct) ❌", status: "lost" },
           { label: "[iOS]", value: "(direct) ❌", status: "lost" }
-        ], note: "Aplikacja się otwiera. Jednak bez zintegrowanego MMP, Firebase GA4 kompletnie nie wie, że instalacja pochodzi z Meta Ads. Kampania spring_sale_vip przypisana do Organic." },
+        ], note: "Inicjacja oprogramowania (first_open). Usługa GA4, z racji braku powiązania sesji, notuje zdarzenie bez kontekstu pierwotnej kampanii reklamowej, zaniżając efektywność Meta Ads." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "deep link", value: "przenosi na promocję ✓", status: "ok" },
           { label: "→ Meta CAPI", value: "wysyła postback ✓", status: "ok" }
-        ], note: "MMP budzi się jako pierwsze. Odzyskuje informacje ze Sklepu, odbudowuje sesję i wymusza Deferred Deep Link na odpowiednią zakładkę (Wyprzedaż) w aplikacji." },
+        ], note: "SDK platformy MMP odczytuje parametry post-instalacyjne ze sklepu i obsługuje mechanikę powiązania sesji, finalnie egzekwując przekierowanie do ścieżki Deferred Deep Link." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV", value: "aktualizacja 1 (app)", status: "partial" },
           { label: "Postback", value: "⏳ oczekuje", status: "delayed" }
-        ], note: "Aplikacja na iOS przypisuje domyślną Wartość Konwersji (CV), ale postback wciąż czeka w kolejce systemu Apple." },
+        ], note: "Inicjalizacja pierwszej, domyślnej Wartości Konwersji (Conversion Value) przez platformę SKAdNetwork, podlegającej procesom opóźnionej wysyłki." },
       },
       google: {
         ga4: { status: "visible", dataState: [
           { label: "[Android] kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "[iOS] kampania", value: "(direct) ❌", status: "lost" },
           { label: "[Android] deep link", value: "auto-redirect ✓", status: "ok" }
-        ], note: "Niesamowita przewaga na Androidzie! GA4 natychmiast przechwytuje dane i użytkownik trafia na ekran Wyprzedaży. Na iOS niestety proces ten zawodzi i ruch ląduje w (direct)." },
+        ], note: "Poprawne powiązanie atrybucji GA4 ze zdarzeniem inicjalizacji w Androidzie oraz płynna realizacja scenariusza deep-link. Struktura i parametry konwersji (direct) są typowe dla strat powiązania środowiska iOS." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "→ Google Ads", value: "potwierdzenie ✓", status: "ok" }
-        ], note: "Podobnie jak w GA4, MMP poprawnie atrybuuje instalację na Androidzie. Na iOS wspiera się modelowaniem lub SKANem." },
+        ], note: "Model weryfikacji powodzi się bezpośrednio w ekosystemie Android. Odtworzenie ścieżki w środowisku Apple oparte jest w znacznej mierze o zasoby modelowania probabilistycznego." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV", value: "aktualizacja", status: "partial" },
           { label: "Postback", value: "⏳ oczekuje", status: "delayed" }
-        ], note: "System operacyjny na bieżąco monitoruje aplikację dla SKAdNetwork. Nic się nie zmienia wizualnie." },
+        ], note: "Transparentna realizacja założeń ramowych SKAdNetwork na poziomie systemowym, zachodząca bez ingerencji w proces instalacji aplikacji." },
       },
       tiktok: {
         ga4: { status: "partial", dataState: [
           { label: "event", value: "first_open ✓", status: "ok" },
           { label: "kampania", value: "(direct) ❌", status: "lost" }
-        ], note: "GA4 widzi first_open, ale przypisuje go do (direct). Nie mamy pojęcia, że użytkownik przyszedł z TikToka." },
+        ], note: "Analiza GA4 rejestruje uruchomienie programu, jednak bez przypisanej kampanii źródłowej (odrzucony parametr UTM). Konwersja przyporządkowana nieskategoryzowanemu ruchowi 'direct'." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "[Android]", value: "100% atrybucja ✓", status: "ok" },
           { label: "[iOS]", value: "niska szansa dopasowania", status: "partial" }
-        ], note: "Na Androidzie MMP poprawnie kieruje na ekran Wiosennej Wyprzedaży. Na iOS użytkownik może trafić na ekran główny apki (broken deferred deep link)." },
+        ], note: "Scenariusz powiązania instalacji z docelowym ekranem uwieńczony sukcesem dla użytkowników systemu Android. Wysoki procent zakłóceń lejka Deferred Deep Link podczas wejścia z iOS." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV", value: "aktualizacja", status: "partial" }
-        ], note: "Zanonimizowany identyfikator instalacji przypisany w SKAdNetwork na iOS." },
+        ], note: "W pełni anonimizowany profil instalacji przydzielony z poziomu operacyjnego dla standardu SKAdNetwork." },
       },
       asa: {
         ga4: { status: "visible", dataState: [
           { label: "event", value: "first_open ✓", status: "ok" },
           { label: "AdAttribKit", value: "odczyt tokenu ✓", status: "ok" },
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" }
-        ], note: "Jeżeli deweloper napisał kod odczytujący Apple AdAttributionKit w momencie first_open i wysłał to do GA4 – otrzymujemy idealną, natywną atrybucję na iOS!" },
+        ], note: "Możliwość pełnej, natywnej atrybucji w środowisku iOS pod warunkiem zaimplementowania logiki obsługi zdarzeń AdAttributionKit w ramach inicjacji aplikacji." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "Atrybucja", value: "deterministyczna iOS ✓", status: "ok" }
-        ], note: "MMP bezbłędnie przechwytuje token od Apple. Pełna gwarancja atrybucji na urządzeniach z iOS." },
+        ], note: "Wysoka spójność weryfikacji atrybucyjnej. Platforma odczytuje poprawnie weryfikowalny i nierejestrowalny token bezpośrednio z API firmy Apple." },
         skan: { status: "visible", dataState: [
           { label: "AdAttributionKit", value: "sukces ✓", status: "ok" },
           { label: "Postback", value: "brak opóźnień ✓", status: "ok" }
-        ], note: "Rozwiązanie systemowe zadziałało natychmiastowo. Zero czarnej dziury, zero opóźnień." },
+        ], note: "Implementacja systemowa funkcjonuje w sposób asynchroniczny z całkowitym zniwelowaniem wskaźnika deficytu danych operacyjnych i opóźnień czasowych." },
       },
     },
   },
@@ -359,63 +457,63 @@ const NODES: JourneyNode[] = [
           { label: "event", value: "purchase ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "kampania", value: "(direct) ❌", status: "lost" }
-        ], note: "Zakup zakończony sukcesem! Jednak w panelu GA4 revenue (349 PLN) przypisze się do ruchu (direct), co sprawia, że analityk obcina budżet Meta Ads (niski ROAS)." },
+        ], note: "Transakcja zrealizowana pozytywnie (event: purchase). Usługa GA4 z dużym prawdopodobieństwem zniekształci atrybucję ROI dla kanału Meta Ads z racji kwalifikacji jako ruch direct." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "→ Meta CAPI", value: "wysyła ROAS ✓", status: "ok" }
-        ], note: "MMP przypisuje zakup 349 PLN do Meta Ads i wysyła Server-to-Server postback (CAPI). Algorytmy FB uczą się, do kogo kierować reklamy wyprzedaży." },
+        ], note: "Atrybucja zakupu przez serwery MMP, generująca sprzężenie Server-to-Server postback dla API docelowego (CAPI). Istotny sygnał dla optymalizacji algorytmu po stronie Meta Ads." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV Update", value: "349 PLN (skrzynka 4)", status: "partial" },
           { label: "[iOS] Postback", value: "⏳ w końcu wysłany", status: "delayed" }
-        ], note: "SKAN na iOS podbija wartość konwersji (CV) do najwyższego progu odpowiadającego 349 PLN i blokuje timer, szykując się do opóźnionego postbacku do Meta." },
+        ], note: "Aktualizacja progu parametru wartości (Conversion Value) do odzwierciedlenia skali transakcji. Uruchamia to mechanizm odroczonego postbacku wymaganego normą SKAN." },
       },
       google: {
         ga4: { status: "visible", dataState: [
           { label: "event", value: "purchase ✓", status: "ok" },
           { label: "[Android] kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "[iOS] kampania", value: "(direct) ❌", status: "lost" }
-        ], note: "Ekosystem dzieli się w pół: Na Androidzie GA4 perfekcyjnie przypisuje 349 PLN do kampanii Google Ads i ROAS jest genialny. Na iOS pełna porażka – ruch wpada do (direct)." },
+        ], note: "Podział wyników ze względu na system operacyjny: prawidłowy zwrot i przypisanie ROAS na systemie Android względem silnego ryzyka zakwalifikowania strumienia przychodów z platform iOS do obszaru 'direct'." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "→ Google API", value: "aktualizacja ROAS ✓", status: "ok" }
-        ], note: "MMP ratuje sprawę wysyłając postback z zakupem 349 PLN bezpośrednio do Google Ads API." },
+        ], note: "System MMP poprawia skuteczność estymacji poprzez przesłanie informacji o udanej transakcji bezpośrednio za pomocą integracji po stronie serwera API (S2S)." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV", value: "349 PLN", status: "partial" },
           { label: "[Android]", value: "nie dotyczy", status: "ok" }
-        ], note: "Google Ads na iOS ostatecznie polega na opóźnionym zanonimizowanym postbacku SKAN dla celów optymalizacyjnych." },
+        ], note: "Rozwiązania platformy Google dla środowisk iOS polegają wtórnie na odroczonych w czasie raportach o zdarzeniach ze strony interfejsu SKAdNetwork, wpływających na opóźnienia w analizie modeli w czasie rzeczywistym." },
       },
       tiktok: {
         ga4: { status: "visible", dataState: [
           { label: "event", value: "purchase ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "kampania", value: "(direct) ❌", status: "lost" }
-        ], note: "Zakup odnotowany, ale w GA4 pojawia się wielka pusta plama w raportach TikTok Ads (przypisane do direct)." },
+        ], note: "Finalizacja lejka, pomimo realizacji konwersji widoczna defragmentacja z powodu braku transparentnej atrybucji. Wydatki na kampanię ulegają deprecjacji po względem przypisanego zwrotu ROAS." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "→ TikTok Events", value: "wysyła ROAS ✓", status: "ok" }
-        ], note: "MMP pozwala reklamodawcy udowodnić zwrot z inwestycji z TikTok Ads, wysyłając postback konwersyjny." },
+        ], note: "Integracja ze strukturą MMP dostarcza kluczowych informacji biznesowych o efektywnym wskaźniku ROAS umożliwiających audyt kosztów zakupu ruchu w TikTok Ads." },
         skan: { status: "partial", dataState: [
           { label: "[iOS] CV", value: "349 PLN", status: "partial" },
           { label: "[iOS] Postback", value: "⏳ opóźnienie 24-48h", status: "delayed" }
-        ], note: "System Apple na iOS anonimizuje i opóźnia dane o zakupie 349 PLN zanim poinformuje TikToka." },
+        ], note: "Anonimizacja pakietów instalacyjnych zgodna z paradygmatem ochrony danych (ATT) ogranicza zdolność natychmiastowego powiązania konwersji dla zintegrowanych systemów stron trzecich." },
       },
       asa: {
         ga4: { status: "visible", dataState: [
           { label: "event", value: "purchase ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" },
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" }
-        ], note: "Dzięki deterministycznej integracji AdAttributionKit z GA4, zakup na iOS jest perfekcyjnie powiązany ze słowem kluczowym i kampanią ASA." },
+        ], note: "Spójność rozwiązań: transakcja i atrybucja przypisana przez GA4 zachowuje bezpośrednie powiązanie analityczne z wykorzystaniem detali semantycznych użytego kanału ASA." },
         mmp: { status: "visible", dataState: [
           { label: "kampania", value: "spring_sale_vip ✓", status: "ok" },
           { label: "revenue", value: "349.00 PLN ✓", status: "ok" }
-        ], note: "MMP otrzymuje perfekcyjne dane na systemie iOS – żadnych strat, modelowania, opóźnień." },
+        ], note: "Logowanie instalacji cechuje się maksymalnym zakresem danych deterministycznych w środowisku Apple bez występowania zakłóceń estymacji zjawiska (modelingu)." },
         skan: { status: "visible", dataState: [
           { label: "[iOS] AdAttribKit", value: "potwierdzenie ✓", status: "ok" },
           { label: "wartość", value: "pełna, bez agregacji ✓", status: "ok" }
-        ], note: "Poziom systemu raportuje pełen sukces atrybucji natychmiast do panelu Apple Search Ads, dostarczając dokładny pomiar ROAS." },
+        ], note: "Warstwa natywna systemu wysyła natychmiastowy raport sukcesji, przekazując szczegółowy parametr do analiz po stronie analityka w sposób wykluczający rozbieżność danych i spadek skuteczności ROAS." },
       },
     },
   },
@@ -439,7 +537,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
   const isPl = lang === "pl";
   return (
     <motion.div
-      className="flex flex-col lg:flex-row items-center justify-between w-full h-full px-6 pt-12 pb-8 sm:pt-20 text-center lg:text-left relative overflow-hidden gap-8 lg:gap-16 max-w-7xl mx-auto"
+      className="relative w-full max-w-7xl h-full mx-auto px-5 lg:px-10 flex flex-col lg:flex-row items-center justify-center lg:justify-between overflow-y-auto overflow-x-hidden pt-6 pb-20 lg:pt-0 lg:pb-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
@@ -598,10 +696,10 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
       </motion.div>
 
       <motion.p
-        className="text-[11px] text-white/60 font-mono mt-2 absolute bottom-6"
+        className="text-[11px] text-white/60 font-mono mt-2 absolute bottom-6 hidden lg:block"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95 }}
       >
-        {isPl ? "najedź na planetę, aby zobaczyć szczegóły" : "hover a planet to see details"}
+        {isPl ? "Rozpocznij analizę – wybierz ekosystem reklamowy" : "Start analysis – select an ad ecosystem"}
       </motion.p>
     </motion.div>
   );
@@ -893,6 +991,51 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                     <div className="text-[9px] text-white/40">Koszyk do atrybucji</div>
                   </div>
                 </div>
+
+                {/* Desktop Verdict */}
+                {activeNodeIdx === NODES.length - 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-3 p-4 rounded-2xl border border-white/10"
+                    style={{ background: "rgba(2,8,24,0.9)", backdropFilter: "blur(20px)" }}
+                  >
+                    <div className="text-[10px] uppercase font-mono tracking-widest text-white/50 mb-3 flex items-center gap-1.5">
+                      <span style={{ color: eco.color }}>{eco.icon}</span> 
+                      {lang === "pl" ? "Werdykt Ekosystemu" : "Ecosystem Verdict"}
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <div>
+                        {/* Matrix UI */}
+                        <div className="text-[9px] text-white/40 font-bold mb-1.5 uppercase tracking-wider">{lang === "pl" ? "Dostępność w tym narzędziu:" : "Data Availability:"}</div>
+                        <div className="grid grid-cols-1 gap-2 text-[10px]">
+                          <div className="bg-white/5 p-2 rounded border border-white/5">
+                            <div className="font-bold text-white/80 mb-1 flex items-center gap-1.5">
+                              {activePerspective === 'ga4' ? 'GA4 (Firebase)' : activePerspective === 'mmp' ? 'MMP (AppsFlyer/Adjust)' : 'Poziom OS / SKAdNetwork'}
+                            </div>
+                            <div className="flex items-start gap-1 mb-1">
+                              <span className="shrink-0 opacity-70">🤖</span>
+                              <span className={`leading-tight ${eco.summary.dataAvailability[activePerspective].android.status === 'full' ? 'text-green-400' : eco.summary.dataAvailability[activePerspective].android.status === 'none' ? 'text-red-400' : eco.summary.dataAvailability[activePerspective].android.status === 'na' ? 'text-white/30' : 'text-yellow-400'}`}>{eco.summary.dataAvailability[activePerspective].android.text[lang as "pl" | "en"]}</span>
+                            </div>
+                            <div className="flex items-start gap-1">
+                              <span className="shrink-0 opacity-70">🍏</span>
+                              <span className={`leading-tight ${eco.summary.dataAvailability[activePerspective].ios.status === 'full' ? 'text-green-400' : eco.summary.dataAvailability[activePerspective].ios.status === 'none' ? 'text-red-400' : eco.summary.dataAvailability[activePerspective].ios.status === 'na' ? 'text-white/30' : 'text-yellow-400'}`}>{eco.summary.dataAvailability[activePerspective].ios.text[lang as "pl" | "en"]}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-green-400/80 font-bold mb-1 uppercase tracking-wider">{lang === "pl" ? "Kluczowa Korzyść" : "Key Benefit"}</div>
+                        <div className="text-[11px] text-white/90 leading-snug">{eco.summary.benefit[lang as "pl" | "en"]}</div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-red-400/80 font-bold mb-1 uppercase tracking-wider">{lang === "pl" ? "Ryzyko Biznesowe" : "Business Risk"}</div>
+                        <div className="text-[11px] text-white/90 leading-snug">{eco.summary.risk[lang as "pl" | "en"]}</div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               {/* ─── Case Study Mobile Chip (hidden now) ─── */}
@@ -1222,8 +1365,47 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                   })}
                 </div>
                 
+                {/* Mobile Verdict */}
+                <div className="mt-8 p-5 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden" style={{ background: "rgba(2,8,24,0.95)" }}>
+                  <div className="absolute top-0 left-0 right-0 h-1" style={{ background: eco.color }} />
+                  <div className="text-[11px] uppercase font-mono tracking-widest text-white/50 mb-4 flex items-center gap-2 mt-1">
+                    <span className="text-base" style={{ color: eco.color }}>{eco.icon}</span> 
+                    {lang === "pl" ? "Werdykt Ekosystemu" : "Ecosystem Verdict"}
+                  </div>
+                  
+                  <div className="flex flex-col gap-5">
+                    <div>
+                      {/* Matrix UI Mobile */}
+                      <div className="text-[10px] text-white/40 font-bold mb-2 uppercase tracking-wider">{lang === "pl" ? "Dostępność w tym narzędziu:" : "Data Availability:"}</div>
+                      <div className="flex flex-col gap-2 text-xs">
+                        <div className="bg-white/5 p-2.5 rounded-lg border border-white/5">
+                          <div className="font-bold text-white/80 mb-1.5 pb-1.5 border-b border-white/5 flex items-center gap-1.5">
+                            {activePerspective === 'ga4' ? 'GA4 (Firebase)' : activePerspective === 'mmp' ? 'MMP (AppsFlyer/Adjust)' : 'Poziom OS / SKAdNetwork'}
+                          </div>
+                          <div className="flex items-start gap-2 mb-1.5">
+                            <span className="shrink-0 opacity-70 text-sm">🤖</span>
+                            <span className={`leading-tight ${eco.summary.dataAvailability[activePerspective].android.status === 'full' ? 'text-green-400' : eco.summary.dataAvailability[activePerspective].android.status === 'none' ? 'text-red-400' : eco.summary.dataAvailability[activePerspective].android.status === 'na' ? 'text-white/30' : 'text-yellow-400'}`}>{eco.summary.dataAvailability[activePerspective].android.text[lang as "pl" | "en"]}</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="shrink-0 opacity-70 text-sm">🍏</span>
+                            <span className={`leading-tight ${eco.summary.dataAvailability[activePerspective].ios.status === 'full' ? 'text-green-400' : eco.summary.dataAvailability[activePerspective].ios.status === 'none' ? 'text-red-400' : eco.summary.dataAvailability[activePerspective].ios.status === 'na' ? 'text-white/30' : 'text-yellow-400'}`}>{eco.summary.dataAvailability[activePerspective].ios.text[lang as "pl" | "en"]}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-green-400/80 font-bold mb-1.5 uppercase tracking-wider">{lang === "pl" ? "Kluczowa Korzyść" : "Key Benefit"}</div>
+                      <div className="text-xs text-white/90 leading-relaxed">{eco.summary.benefit[lang as "pl" | "en"]}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-red-400/80 font-bold mb-1.5 uppercase tracking-wider">{lang === "pl" ? "Ryzyko Biznesowe" : "Business Risk"}</div>
+                      <div className="text-xs text-white/90 leading-relaxed">{eco.summary.risk[lang as "pl" | "en"]}</div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Mobile perspective description at the bottom of feed */}
-                <div className="mt-8 mb-8 p-4 rounded-xl border border-white/5 bg-white/5 text-xs text-white/60 leading-relaxed">
+                <div className="mt-6 mb-8 p-4 rounded-xl border border-white/5 bg-white/5 text-xs text-white/60 leading-relaxed">
                   {persp.desc(ecosystem)}
                 </div>
               </div>
@@ -1232,7 +1414,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                 <motion.div className="absolute bottom-16 sm:bottom-8 left-1/2 -translate-x-1/2 text-center pointer-events-none"
                   animate={{ y: [0, 8, 0], opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}>
-                  <div className="text-white/60 text-xs font-mono">scroll lub kliknij węzeł</div>
+                  <div className="text-white/60 text-xs font-mono">wybierz węzeł ze ścieżki</div>
                   <div className="text-white/90 text-lg mt-0.5">↕</div>
                 </motion.div>
               )}
@@ -1243,7 +1425,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
 
       {/* BOTTOM BAR (journey only) */}
       {screen === "journey" && (
-        <div className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-between px-5 h-12"
+        <div className="hidden lg:flex absolute bottom-0 left-0 right-0 z-50 items-center justify-between px-5 h-12"
           style={{ background: "rgba(2,8,24,0.9)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <button onClick={() => { goToNode(Math.max(0, activeNodeIdx - 1)); stopPlay(); }}
             disabled={activeNodeIdx === 0}
