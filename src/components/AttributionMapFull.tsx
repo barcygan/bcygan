@@ -574,7 +574,7 @@ function WelcomeScreen({ onSelect, lang }: { onSelect: (eco: EcosystemId) => voi
 
       {/* Mobile ecosystem picker (visible only on mobile) */}
       <motion.div
-        className="lg:hidden w-full grid grid-cols-2 gap-3 pb-4 relative z-20"
+        className="lg:hidden w-full flex flex-col gap-3 pb-24 relative z-20"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
       >
         {ECOSYSTEMS.map((eco) => (
@@ -895,7 +895,8 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                 </div>
               </div>
 
-              {/* ─── Case Study Mobile Chip ─── */}
+              {/* ─── Case Study Mobile Chip (hidden now) ─── */}
+              <div className="hidden">
               {/* Simple expandable chip in bottom-left, above bottom bar */}
               <div className="lg:hidden absolute bottom-16 left-3 z-30">
                 <button
@@ -957,8 +958,10 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                 </div>
               </div>
 
+              </div>
+
               {/* Left dots nav */}
-              <div className="absolute left-2 sm:left-5 top-[20%] lg:top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
+              <div className="hidden lg:flex absolute left-5 top-1/2 -translate-y-1/2 flex-col items-center gap-3 z-10">
                 {NODES.map((_, idx) => (
                   <button
                     key={idx}
@@ -976,7 +979,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
               </div>
 
               {/* Center: Vertical nodes */}
-              <div className="absolute top-[20%] lg:top-1/2 left-1/2 -translate-x-1/2 lg:-translate-y-1/2 flex flex-col items-center" style={{ width: 140 }}>
+              <div className="hidden lg:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ width: 140 }}>
                 {/* Background global orbit rings for the journey view */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-white/5 opacity-50 pointer-events-none" style={{ animation: 'orbit 120s linear infinite' }} />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full border border-white/5 border-dashed opacity-30 pointer-events-none" style={{ animation: 'counter-orbit 180s linear infinite' }} />
@@ -1048,6 +1051,7 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
               </div>
 
               {/* Right: Detail panel */}
+              <div className="hidden lg:block">
               <AnimatePresence mode="wait">
                 {showDetail && (
                   <motion.div
@@ -1124,6 +1128,105 @@ export default function AttributionMapFull({ lang = "pl" }: { lang?: string }) {
                   </motion.div>
                 )}
               </AnimatePresence>
+              </div>
+
+              {/* ─── Mobile Journey Feed (Scrollable Column) ─── */}
+              <div className="lg:hidden absolute inset-0 overflow-y-auto overflow-x-hidden pt-28 pb-32 px-4 z-20">
+                {/* Mobile Case Study Intro */}
+                <div className="mb-8 rounded-2xl border border-white/10 p-5" style={{ background: "rgba(2,8,24,0.85)", backdropFilter: "blur(16px)" }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">🛍️</span>
+                    <div>
+                      <div className="font-black text-white text-base">{lang === "pl" ? "Wiosenna Wyprzedaż" : "Spring Sale"}</div>
+                      <div className="text-xs text-white/50">Case Study · Web2App</div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-white/70 leading-relaxed mt-3 mb-4">
+                    {lang === "pl"
+                      ? "Kampania kieruje stałych klientów do apki przez Sklep (Deferred Deep Link). Przewijaj w dół i obserwuj co widzi GA4, MMP i OS na każdym etapie."
+                      : "Campaign sends loyal users to the app via Store (Deferred Deep Link). Scroll down and watch what GA4, MMP & OS see at each stage."}
+                  </p>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 w-fit">
+                    <span className="text-xl">🛒</span>
+                    <div>
+                      <div className="text-[11px] font-black text-white">349 PLN</div>
+                      <div className="text-[10px] text-white/50">{lang === "pl" ? "Koszyk do atrybucji" : "Target Cart"}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Feed Nodes */}
+                <div className="flex flex-col gap-6 relative">
+                  {/* Vertical connecting line */}
+                  <div className="absolute left-7 top-6 bottom-6 w-0.5 bg-white/10 z-0" />
+                  
+                  {NODES.map((node, idx) => {
+                    const nodeData = node.data[ecosystem][activePerspective];
+                    const statusColor = nodeData.status === "visible" ? "#22c55e" : nodeData.status === "hidden" ? "#ef4444" : nodeData.status === "blackhole" ? "#7c3aed" : "#eab308";
+                    
+                    return (
+                      <div key={node.id} className="relative z-10 flex flex-col gap-3">
+                        {/* Node Header Row */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 shrink-0 rounded-full flex items-center justify-center text-3xl shadow-lg border border-white/20" 
+                               style={{ background: "rgba(2,8,24,0.95)" }}>
+                            {node.icon}
+                          </div>
+                          <div>
+                            <div className="font-black text-lg text-white">{node.label}</div>
+                            <div className="text-xs text-white/60">{node.sublabel(ecosystem)}</div>
+                          </div>
+                        </div>
+                        
+                        {/* Data Card */}
+                        <div className="ml-6 pl-8 border-l-2" style={{ borderColor: nodeData.status === "hidden" ? "#ffffff10" : persp.color + "40" }}>
+                          <div className="rounded-2xl border border-white/10 overflow-hidden" 
+                               style={{ background: "rgba(2,8,24,0.85)", backdropFilter: "blur(12px)" }}>
+                            <div className="px-4 py-3 border-b flex justify-between items-center" style={{ borderColor: persp.color + "18", background: persp.color + "06" }}>
+                              <span className="text-xs font-bold" style={{ color: persp.color }}>{persp.label}</span>
+                              <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" style={{ color: statusColor }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusColor }} />
+                                {nodeData.status === "visible" ? (lang === "pl" ? "widoczne" : "visible") : nodeData.status === "hidden" ? (lang === "pl" ? "utracone" : "lost") : nodeData.status === "blackhole" ? (lang === "pl" ? "czarna dziura" : "black hole") : (lang === "pl" ? "częściowe" : "partial")}
+                              </span>
+                            </div>
+                            
+                            {nodeData.dataState.length > 0 ? (
+                              <div className="px-4 py-4 space-y-3">
+                                {nodeData.dataState.map((row, i) => (
+                                  <div key={i} className="flex flex-col gap-1.5">
+                                    <span className="text-xs font-mono text-white/50 uppercase">{row.label}</span>
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold w-fit" style={{
+                                      background: STATUS_COLOR[row.status] + "10",
+                                      color: row.status === "lost" ? STATUS_COLOR[row.status] + "80" : STATUS_COLOR[row.status],
+                                      textDecoration: row.status === "lost" ? "line-through" : "none",
+                                    }}>
+                                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: STATUS_COLOR[row.status], opacity: row.status === "lost" ? 0.5 : 1 }} />
+                                      {row.value}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="px-4 py-6 text-center">
+                                <span className="text-white/40 text-xs">{lang === "pl" ? "Brak widocznych danych" : "No visible data"}</span>
+                              </div>
+                            )}
+                            
+                            <div className="px-4 py-4 border-t" style={{ borderColor: "#ffffff08", background: "#ffffff03" }}>
+                              <p className="text-sm text-white/80 leading-relaxed m-0">{nodeData.note}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Mobile perspective description at the bottom of feed */}
+                <div className="mt-8 mb-8 p-4 rounded-xl border border-white/5 bg-white/5 text-xs text-white/60 leading-relaxed">
+                  {persp.desc(ecosystem)}
+                </div>
+              </div>
 
               {!showDetail && (
                 <motion.div className="absolute bottom-16 sm:bottom-8 left-1/2 -translate-x-1/2 text-center pointer-events-none"
